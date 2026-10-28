@@ -9,8 +9,43 @@ plain='\033[0m'
 xui_folder="${XUI_MAIN_FOLDER:=/usr/local/x-ui}"
 xui_service="${XUI_SERVICE:=/etc/systemd/system}"
 
+# --- GitHub private-repo auth (optional) -------------------------------------
+# Set XUI_GH_TOKEN (or drop the token into /etc/x-ui/gh.token) to download from
+# the private jaseyou/xs-ui repository. Credentials travel via a per-host
+# netrc file, so they apply only to github.com / raw.githubusercontent.com /
+# api.github.com and never leak to the S3 redirect targets of release assets.
+GH_NETRC="${GH_NETRC:-/etc/x-ui/.netrc}"
+GH_TOKEN_FILE="/etc/x-ui/gh.token"
+gh_curl() { curl "$@"; }
+
+gh_setup_auth() {
+    local token="${XUI_GH_TOKEN:-}"
+    if [[ -z "$token" && -s "$GH_TOKEN_FILE" ]]; then
+        token=$(head -n1 "$GH_TOKEN_FILE" | tr -d '[:space:]')
+    fi
+    [[ -n "$token" ]] || return 0
+    mkdir -p "$(dirname "$GH_NETRC")"
+    local umask_bak
+    umask_bak=$(umask)
+    umask 077
+    cat > "$GH_NETRC" <<EOF
+machine github.com login ${token} password x-oauth-basic
+machine raw.githubusercontent.com login ${token} password x-oauth-basic
+machine api.github.com login ${token} password x-oauth-basic
+EOF
+    umask "$umask_bak"
+    chmod 600 "$GH_NETRC"
+    # Persist for later update.sh / x-ui.sh runs unless it came from the file.
+    if [[ ! -s "$GH_TOKEN_FILE" ]]; then
+        printf '%s\n' "$token" > "$GH_TOKEN_FILE"
+        chmod 600 "$GH_TOKEN_FILE"
+    fi
+    gh_curl() { curl --netrc-file "$GH_NETRC" "$@"; }
+}
+
 # check root
 [[ $EUID -ne 0 ]] && echo -e "${red}Fatal error: ${plain} Please run this script with root privilege \n " && exit 1
+gh_setup_auth
 
 # Check OS and set release variable
 if [[ -f /etc/os-release ]]; then
@@ -1621,7 +1656,7 @@ _install_xui_service_unit() {
 
     rm -f "$temp_file"
     if [[ "$source_is_url" == "true" ]]; then
-        curl -fLRo "$temp_file" "$source" > /dev/null 2>&1
+        gh_curl -fLRo "$temp_file" "$source" > /dev/null 2>&1
     else
         cp -f "$source" "$temp_file" > /dev/null 2>&1
     fi
@@ -1652,13 +1687,13 @@ _install_xui_service_unit() {
 # fails with "Failed to fetch x-ui version"), and falls back to the API.
 resolve_latest_tag() {
     local url tag
-    url=$(curl -sSLI -o /dev/null -w '%{url_effective}' --retry 5 --retry-delay 3 --connect-timeout 15 --max-time 60 "https://github.com/jaseyou/xs-ui/releases/latest" 2>/dev/null)
+    url=$(gh_curl -sSLI -o /dev/null -w '%{url_effective}' --retry 5 --retry-delay 3 --connect-timeout 15 --max-time 60 "https://github.com/jaseyou/xs-ui/releases/latest" 2>/dev/null)
     tag=${url##*/tag/}
     if [[ "$tag" != "$url" && -n "$tag" && "$tag" != "latest" ]]; then
         echo "$tag"
         return 0
     fi
-    curl -Ls --retry 5 --retry-delay 3 --connect-timeout 15 --max-time 60 "https://api.github.com/repos/jaseyou/xs-ui/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
+    gh_curl -Ls --retry 5 --retry-delay 3 --connect-timeout 15 --max-time 60 "https://api.github.com/repos/jaseyou/xs-ui/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
 }
 
 # Releases publish <asset>.sha256 next to each archive. A mismatch or a failed
@@ -1667,7 +1702,7 @@ resolve_latest_tag() {
 verify_release_checksum() {
     local url="$1" file="$2" sums="$2.sha256" code expected actual
     rm -f "${sums}"
-    code=$(curl -sL --retry 3 --retry-delay 3 --connect-timeout 15 --max-time 60 -o "${sums}" -w '%{http_code}' "${url}.sha256")
+    code=$(gh_curl -sL --retry 3 --retry-delay 3 --connect-timeout 15 --max-time 60 -o "${sums}" -w '%{http_code}' "${url}.sha256")
     if [[ "${code}" == "404" ]]; then
         rm -f "${sums}"
         echo -e "${yellow}No checksum published for this release, skipping verification${plain}"
@@ -1697,7 +1732,7 @@ require_repo_files() {
     shift
     [[ "${ref}" == "main" ]] && return 0
     for name in "$@"; do
-        status=$(curl -sIL --retry 3 --connect-timeout 15 -o /dev/null -w '%{http_code}' "https://raw.githubusercontent.com/jaseyou/xs-ui/${ref}/${name}")
+        status=$(gh_curl -sIL --retry 3 --connect-timeout 15 -o /dev/null -w '%{http_code}' "https://raw.githubusercontent.com/jaseyou/xs-ui/${ref}/${name}")
         if [[ "${status}" != "200" ]]; then
             echo -e "${red}${name} is not available for ${ref} (HTTP ${status})${plain}"
             echo -e "${red}Install a release that ships it, or 'dev' for the rolling build. Your existing installation has not been touched.${plain}"
@@ -1717,7 +1752,7 @@ install_x-ui() {
             exit 1
         fi
         echo -e "Got x-ui latest version: ${tag_version}, beginning the installation..."
-        curl -fLR --retry 5 --retry-delay 3 --connect-timeout 15 --speed-limit 1 --speed-time 300 -o ${xui_folder}-linux-$(arch).tar.gz https://github.com/jaseyou/xs-ui/releases/download/${tag_version}/x-ui-linux-$(arch).tar.gz
+        gh_curl -fLR --retry 5 --retry-delay 3 --connect-timeout 15 --speed-limit 1 --speed-time 300 -o ${xui_folder}-linux-$(arch).tar.gz https://github.com/jaseyou/xs-ui/releases/download/${tag_version}/x-ui-linux-$(arch).tar.gz
         if [[ $? -ne 0 ]]; then
             echo -e "${red}Downloading x-ui failed, please be sure that your server can access GitHub ${plain}"
             exit 1
@@ -1748,7 +1783,7 @@ install_x-ui() {
 
         url="https://github.com/jaseyou/xs-ui/releases/download/${tag_version}/x-ui-linux-$(arch).tar.gz"
         echo -e "Beginning to install x-ui ${tag_version}"
-        curl -fLR --retry 5 --retry-delay 3 --connect-timeout 15 --speed-limit 1 --speed-time 300 -o ${xui_folder}-linux-$(arch).tar.gz ${url}
+        gh_curl -fLR --retry 5 --retry-delay 3 --connect-timeout 15 --speed-limit 1 --speed-time 300 -o ${xui_folder}-linux-$(arch).tar.gz ${url}
         if [[ $? -ne 0 ]]; then
             echo -e "${red}Download x-ui ${tag_version} failed, please check if the version exists ${plain}"
             exit 1
@@ -1773,7 +1808,7 @@ install_x-ui() {
     require_repo_files "${script_ref}" "${required_files[@]}"
     local xui_script_temp="/usr/bin/x-ui-temp.$$"
     rm -f "${xui_script_temp}"
-    curl -fLRo "${xui_script_temp}" "https://raw.githubusercontent.com/jaseyou/xs-ui/${script_ref}/x-ui.sh"
+    gh_curl -fLRo "${xui_script_temp}" "https://raw.githubusercontent.com/jaseyou/xs-ui/${script_ref}/x-ui.sh"
     if [[ $? -ne 0 ]]; then
         rm -f "${xui_script_temp}"
         echo -e "${red}Failed to download x-ui.sh${plain}"
@@ -1937,7 +1972,7 @@ install_x-ui() {
     if [[ $release == "alpine" ]]; then
         xui_rc_temp="/etc/init.d/x-ui.tmp.$$"
         rm -f "${xui_rc_temp}"
-        curl -fLRo "${xui_rc_temp}" "https://raw.githubusercontent.com/jaseyou/xs-ui/${script_ref}/x-ui.rc"
+        gh_curl -fLRo "${xui_rc_temp}" "https://raw.githubusercontent.com/jaseyou/xs-ui/${script_ref}/x-ui.rc"
         if [[ $? -ne 0 ]]; then
             rm -f "${xui_rc_temp}"
             echo -e "${red}Failed to download x-ui.rc${plain}"

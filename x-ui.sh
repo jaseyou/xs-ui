@@ -62,6 +62,32 @@ acme_listen_flag() {
     fi
 }
 
+
+# --- GitHub private-repo auth (optional) -------------------------------------
+# Reads XUI_GH_TOKEN or the token file persisted by install.sh, then serves
+# GitHub downloads through a per-host netrc file: credentials apply only to
+# github.com / raw.githubusercontent.com / api.github.com and never leak to
+# any redirect target.
+GH_NETRC="/etc/x-ui/.netrc"
+GH_TOKEN_FILE="/etc/x-ui/gh.token"
+gh_curl() { curl "$@"; }
+
+gh_setup_auth() {
+    local token="${XUI_GH_TOKEN:-}"
+    if [[ -z "$token" && -s "$GH_TOKEN_FILE" ]]; then
+        token=$(head -n1 "$GH_TOKEN_FILE" | tr -d '[:space:]')
+    fi
+    [[ -n "$token" ]] || return 0
+    {
+        echo "machine github.com login ${token} password x-oauth-basic"
+        echo "machine raw.githubusercontent.com login ${token} password x-oauth-basic"
+        echo "machine api.github.com login ${token} password x-oauth-basic"
+    } > "$GH_NETRC"
+    chmod 600 "$GH_NETRC"
+    gh_curl() { curl --netrc-file "$GH_NETRC" "$@"; }
+}
+gh_setup_auth
+
 # check root
 [[ $EUID -ne 0 ]] && LOGE "ERROR: You must be root to run this script! \n" && exit 1
 
@@ -129,7 +155,7 @@ before_show_menu() {
 }
 
 install() {
-    bash <(curl -Ls https://raw.githubusercontent.com/jaseyou/xs-ui/main/install.sh)
+    bash <(gh_curl -Ls https://raw.githubusercontent.com/jaseyou/xs-ui/main/install.sh)
     if [[ $? == 0 ]]; then
         if [[ $# == 0 ]]; then
             start
@@ -148,7 +174,7 @@ update() {
         fi
         return 0
     fi
-    bash <(curl -Ls https://raw.githubusercontent.com/jaseyou/xs-ui/main/update.sh)
+    bash <(gh_curl -Ls https://raw.githubusercontent.com/jaseyou/xs-ui/main/update.sh)
     if [[ $? == 0 ]]; then
         LOGI "Update is complete, Panel has automatically restarted "
         before_show_menu
@@ -166,7 +192,7 @@ update_dev() {
     fi
     # XUI_UPDATE_TAG tells update.sh to install the dev-latest pre-release
     # instead of the latest stable tag.
-    XUI_UPDATE_TAG="dev-latest" bash <(curl -Ls https://raw.githubusercontent.com/jaseyou/xs-ui/main/update.sh)
+    XUI_UPDATE_TAG="dev-latest" bash <(gh_curl -Ls https://raw.githubusercontent.com/jaseyou/xs-ui/main/update.sh)
     if [[ $? == 0 ]]; then
         LOGI "Dev update is complete, Panel has automatically restarted "
         before_show_menu
@@ -213,7 +239,7 @@ replace_xui_script() {
 installed_script_url() {
     local ver
     ver=$("${xui_folder}/x-ui" -v 2> /dev/null | tr -d '[:space:]')
-    if [[ "$ver" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && curl -fsIL -o /dev/null "https://raw.githubusercontent.com/jaseyou/xs-ui/v${ver}/x-ui.sh"; then
+    if [[ "$ver" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && gh_curl -fsIL -o /dev/null "https://raw.githubusercontent.com/jaseyou/xs-ui/v${ver}/x-ui.sh"; then
         echo "https://raw.githubusercontent.com/jaseyou/xs-ui/v${ver}/x-ui.sh"
     else
         echo -e "${yellow}No x-ui.sh published for the installed version (${ver:-unknown}), using main${plain}" >&2

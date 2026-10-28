@@ -276,6 +276,12 @@ func (s *PanelService) startUpdate(useDev bool) (int64, error) {
 		for _, kv := range proxyEnv {
 			args = append(args, "--setenv", kv)
 		}
+		// Private-repo downloads inside update.sh need the token: the script
+		// reads /etc/x-ui/gh.token as fallback, but an env-provided token is
+		// forwarded here so it works before the file exists.
+		if ghToken := strings.TrimSpace(os.Getenv("XUI_GH_TOKEN")); ghToken != "" {
+			args = append(args, "--setenv", "XUI_GH_TOKEN="+ghToken)
+		}
 		args = append(args, bash, "-lc", updateScript)
 		cmd := exec.CommandContext(context.Background(), systemdRun, args...)
 		out, err := cmd.CombinedOutput()
@@ -378,6 +384,17 @@ func previousRunIsTerminal() bool {
 	return status.RunID == strconv.FormatInt(updateRunID, 10) && status.State != updateStatePending
 }
 
+
+// applyGitHubToken attaches the XUI_GH_TOKEN bearer token to GitHub requests
+// so a private fork repository can serve update.sh and release metadata. The
+// update.sh script itself reads the same token (env or /etc/x-ui/gh.token) for
+// the release downloads it performs.
+func applyGitHubToken(req *http.Request) {
+	if token := strings.TrimSpace(os.Getenv("XUI_GH_TOKEN")); token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+}
+
 func releaseUpdateSlot() {
 	updateMu.Lock()
 	updateRunning = false
@@ -390,6 +407,7 @@ func downloadPanelUpdater() (string, error) {
 	if reqErr != nil {
 		return "", fmt.Errorf("download panel updater: %w", reqErr)
 	}
+	applyGitHubToken(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("download panel updater: %w", err)
@@ -452,6 +470,7 @@ func fetchPanelRelease(tag string) (*service.Release, error) {
 	if reqErr != nil {
 		return nil, reqErr
 	}
+	applyGitHubToken(req)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
