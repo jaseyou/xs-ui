@@ -1,0 +1,26 @@
+/* 初始化向导(简单模式) */
+.wizard-template-card {
+  cursor: pointer;
+}
+
+.wizard-nav-btn {
+  font: inherit;
+  font-size: 13.5px;
+  padding: 6px 16px;
+  border-radius: 9px;
+  border: 1px solid var(--ant-color-border-secondary);
+  background: var(--ant-color-bg-container);
+  color: var(--ant-color-text);
+  cursor: pointer;
+}
+
+.wizard-nav-btn.primary {
+  background: var(--ant-color-primary);
+  border-color: var(--ant-color-primary);
+  color: var(--ant-color-white, #fff);
+}
+
+.wizard-nav-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

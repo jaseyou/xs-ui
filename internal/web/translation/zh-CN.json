@@ -2893,5 +2893,24 @@
     "restartXray": "重启 Xray 服务",
     "restartXraySuccess": "Xray 服务已成功重启",
     "settings": "设置"
+  },
+  "simpleMode": {
+    "toExpert": "专家模式",
+    "toSimple": "简单模式",
+    "toggleTitle": "在精简面板与完整面板之间切换"
+  },
+  "wizard": {
+    "title": "开始使用",
+    "step1": "选择监听器",
+    "step2": "域名与证书",
+    "step3": "确认创建",
+    "step1Desc": "选择要创建的监听器模板,已标出推荐项;之后随时可以再调整。",
+    "step3Desc": "将使用全新密钥和随机端口创建这些监听器(固定端口模板使用标准端口)。",
+    "domainHint": "域名需已解析到本服务器。Reality 模板使用本机伪装站 127.0.0.1:7443,无需证书。",
+    "recommended": "推荐",
+    "prev": "上一步",
+    "next": "下一步",
+    "done": "已创建 {count} 个监听器,可以开始使用了!",
+    "noInputsNeeded": "所选模板无需额外填写内容。"
   }
 }

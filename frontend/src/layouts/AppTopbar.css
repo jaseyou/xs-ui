@@ -175,3 +175,27 @@
     display: none;
   }
 }
+
+/* 简单/专家模式切换按钮 */
+.topbar-mode-btn {
+  font: inherit;
+  font-size: 12.5px;
+  padding: 5px 11px;
+  border-radius: 99px;
+  border: 1px solid var(--ant-color-border-secondary);
+  background: var(--ant-color-bg-container);
+  color: var(--ant-color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.topbar-mode-btn:hover {
+  color: var(--ant-color-primary);
+  border-color: var(--ant-color-primary);
+}
+
+.topbar-mode-btn.simple {
+  background: color-mix(in srgb, var(--ant-color-primary) 14%, transparent);
+  border-color: color-mix(in srgb, var(--ant-color-primary) 40%, transparent);
+  color: var(--ant-color-primary);
+}

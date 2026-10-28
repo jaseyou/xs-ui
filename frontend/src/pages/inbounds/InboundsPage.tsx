@@ -39,6 +39,8 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { useNodesQuery } from '@/api/queries/useNodesQuery';
 import { useAllSettings } from '@/api/queries/useAllSettings';
+import { isWizardDone, markWizardDone } from './SetupWizardModal';
+import { useSimpleMode } from '@/hooks/useSimpleMode';
 import { useHostsQuery } from '@/api/queries/useHostsQuery';
 import { withHostEndpoints } from '@/lib/hosts/host-link';
 import AppTopbar from '@/layouts/AppTopbar';
@@ -53,6 +55,7 @@ const InboundFormModal = lazy(() => import('./form/InboundFormModal'));
 const CloneInboundModal = lazy(() => import('./CloneInboundModal'));
 const GenerateListenersModal = lazy(() => import('./GenerateListenersModal'));
 const InboundDetailPanel = lazy(() => import('./InboundDetailPanel'));
+const SetupWizardModal = lazy(() => import('./SetupWizardModal'));
 const InboundInfoModal = lazy(() => import('./info/InboundInfoModal'));
 const AttachClientsModal = lazy(() => import('./clients/AttachClientsModal'));
 const AttachExistingClientsModal = lazy(() => import('./clients/AttachExistingClientsModal'));
@@ -114,6 +117,7 @@ export default function InboundsPage() {
     setMessageInstance(messageApi);
   }, [messageApi]);
   const { allSetting: generatePanelSettings } = useAllSettings();
+  const { simple } = useSimpleMode();
 
   const { nodes: nodesList, fetched: nodesFetched } = useNodesQuery();
   // MTProto share links are generated from this list, so an empty one must mean
@@ -183,10 +187,22 @@ export default function InboundsPage() {
   const [generateOpen, setGenerateOpen] = useState(false);
   // List + detail split: the row clicked on the left drives the right panel.
   const [detailId, setDetailId] = useState<number | null>(null);
+  const [wizardOpen, setWizardOpen] = useState(false);
   const detailInbound = useMemo(
     () => (dbInbounds ?? []).find((ib) => ib.id === detailId) ?? null,
     [dbInbounds, detailId],
   );
+  // 简单模式下首次使用(还没有任何入站)自动弹一次初始化向导;关闭即视为已看过。
+  const [wizardDismissed, setWizardDismissed] = useState(false);
+  const wizardAutoOpen =
+    simple && fetched && (dbInbounds ?? []).length === 0 && !wizardDismissed && !isWizardDone();
+  const closeWizard = useCallback(() => {
+    setWizardOpen(false);
+    if (wizardAutoOpen) {
+      markWizardDone();
+      setWizardDismissed(true);
+    }
+  }, [wizardAutoOpen]);
   const [cloneSource, setCloneSource] = useState<DBInbound | null>(null);
 
   const [textOpen, setTextOpen] = useState(false);
@@ -815,6 +831,7 @@ export default function InboundsPage() {
                           hosts={hosts}
                           onAddInbound={onAddInbound}
                           onGenerateListeners={onGenerateListeners}
+                          onOpenWizard={() => setWizardOpen(true)}
                           selectedId={detailId}
                           onRowClick={setDetailId}
                           onGeneralAction={onGeneralAction}
@@ -926,6 +943,18 @@ export default function InboundsPage() {
             dbInbound={cloneSource}
             nodes={nodesList || []}
             portsInUse={clonePortsInUse}
+          />
+        </LazyMount>
+
+        <LazyMount when={wizardOpen}>
+          <SetupWizardModal
+            open={wizardOpen || wizardAutoOpen}
+            onClose={closeWizard}
+            onFinished={refresh}
+            dbInbounds={dbInbounds || []}
+            portsInUse={clonePortsInUse.get(0) ?? new Set<number>()}
+            panelCertFile={generatePanelSettings?.webCertFile ?? ''}
+            panelKeyFile={generatePanelSettings?.webKeyFile ?? ''}
           />
         </LazyMount>
 

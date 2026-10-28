@@ -34,6 +34,7 @@ import { pauseAnimationsUntilLeave } from '@/hooks/useTheme';
 import { useTheme } from '@/hooks/useTheme';
 import { useCommandPalette } from '@/components/command-palette/useCommandPalette';
 import { useAllSettings } from '@/api/queries/useAllSettings';
+import { SIMPLE_MODE_HIDDEN_ROUTES, useSimpleMode } from '@/hooks/useSimpleMode';
 import { PANEL_ROUTES } from '@/routes/panelRoutes';
 import { BRAND_NAME, BRAND_REPO_URL } from '@/lib/branding';
 import { formatPanelVersion } from '@/lib/panel-version';
@@ -120,6 +121,7 @@ export default function AppTopbar() {
   const navigate = useNavigate();
   const { pathname, hash } = useLocation();
   const { allSetting } = useAllSettings();
+  const { simple, toggle: toggleSimple } = useSimpleMode();
   const showSubFormats = !!(allSetting.subJsonEnable || allSetting.subClashEnable);
   const showSubBalancers = !!allSetting.subJsonEnable;
 
@@ -233,8 +235,16 @@ export default function AppTopbar() {
     }
   }, [isDark, isUltra, toggleTheme, toggleUltra]);
 
+  const visibleRoutes = useMemo(
+    () =>
+      simple
+        ? PANEL_ROUTES.filter((route) => !SIMPLE_MODE_HIDDEN_ROUTES.has(route.path))
+        : PANEL_ROUTES,
+    [simple],
+  );
+
   const drawerItems = useMemo<MenuProps['items']>(() => {
-    const items: MenuProps['items'] = PANEL_ROUTES.map((route) => {
+    const items: MenuProps['items'] = visibleRoutes.map((route) => {
       const Icon = route.icon as ComponentType;
       if (route.path === '/settings')
         return {
@@ -255,14 +265,14 @@ export default function AppTopbar() {
     items.push({ type: 'divider' });
     items.push({ key: LOGOUT_KEY, icon: <LogoutOutlined aria-hidden />, label: t('logout') });
     return items;
-  }, [settingsChildren, xrayChildren, t]);
+  }, [visibleRoutes, settingsChildren, xrayChildren, t]);
 
   const settingsActive = pathname === '/settings';
   const xrayActive = pathname === '/xray';
 
   const desktopItems = useMemo(
     () =>
-      PANEL_ROUTES.map((route) => {
+      visibleRoutes.map((route) => {
         const Icon = route.icon;
         const label = t(route.titleKey);
         const active = route.path === '/' ? pathname === '/' : pathname.startsWith(route.path);
@@ -316,6 +326,7 @@ export default function AppTopbar() {
         );
       }),
     [
+      visibleRoutes,
       openLink,
       onMenuClick,
       pathname,
@@ -379,6 +390,16 @@ export default function AppTopbar() {
       )}
 
       <div className="topbar-actions">
+        <Tooltip title={t('simpleMode.toggleTitle')}>
+          <button
+            type="button"
+            className={`topbar-mode-btn${simple ? ' simple' : ''}`}
+            aria-pressed={!simple}
+            onClick={toggleSimple}
+          >
+            {simple ? t('simpleMode.toExpert') : t('simpleMode.toSimple')}
+          </button>
+        </Tooltip>
         {commandTrigger}
         <VersionBadge version={panelVersion} />
         <ThemeCycleButton isDark={isDark} isUltra={isUltra} onCycle={cycleTheme} />

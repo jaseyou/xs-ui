@@ -2,21 +2,19 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Checkbox, Col, Input, Modal, Row, Select, Typography, message } from 'antd';
 
-import { HttpUtil } from '@/utils';
-import { RandomUtil } from '@/utils';
 import type { NodeRecord } from '@/api/queries/useNodesQuery';
 import type { DBInbound } from '@/models/dbinbound';
 import {
   LISTENER_TEMPLATES,
   findOverwrites,
-  generateObfsPassword,
-  generateSs2022Password,
-  generateTemplateEmail,
-  pickListenerPort,
-  templateTag,
   type GeneratedKeys,
-  type TemplatePayload,
 } from '@/lib/xray/listener-templates';
+import {
+  buildListenerCreations,
+  createListenerInbounds,
+  gatherListenerKeys,
+  removeOverwrites,
+} from '@/lib/xray/listener-create';
 
 // 0 is the "local panel" sentinel (inbounds without a nodeId) — the same
 // convention as the clients page node filter and the clone dialog.
@@ -31,13 +29,6 @@ interface GenerateListenersModalProps {
   panelKeyFile: string;
   onClose: () => void;
   onGenerated: () => void | Promise<void>;
-}
-
-interface PreparedCreate {
-  templateId: string;
-  label: string;
-  payload: TemplatePayload;
-  overwrite: DBInbound | null;
 }
 
 export default function GenerateListenersModal({
@@ -97,65 +88,11 @@ export default function GenerateListenersModal({
   const needsCert = selectedTemplates.some((tpl) => tpl.needsCert);
 
   const overwriteList = useMemo(
-    () => findOverwrites(selected, dbInbounds, isNodeTarget ? target : null),
+    () => findOverwrites(selected, dbInbounds as DBInbound[], isNodeTarget ? target : null),
     [selected, dbInbounds, target, isNodeTarget],
   );
 
-  async function gatherKeys(): Promise<GeneratedKeys> {
-    const keys: GeneratedKeys = {
-      reality: null,
-      mldsa65: null,
-      vlessEncMlkem: null,
-      clientUuid: crypto.randomUUID(),
-      clientPassword: crypto.randomUUID().replace(/-/g, ''),
-      obfsPassword: generateObfsPassword(),
-      ssPassword: generateSs2022Password(),
-      shortIds: RandomUtil.randomShortIds()
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean),
-      email: '',
-    };
-    const wantReality = selectedTemplates.some((tpl) => tpl.needsDomain && tpl.core === 'xray');
-    const wantMldsa = selected.some((id) => id === 'reality-mldsa-vision');
-    const wantVlessEnc = selected.some(
-      (id) => id === 'tls-pqc-xhttp' || id === 'tls-pqc-vision-xhttp',
-    );
-    const fetchJson = async (url: string) => {
-      const msg = await HttpUtil.get(url, undefined, { silent: true });
-      if (!msg?.success) throw new Error(msg?.msg || url);
-      return msg.obj;
-    };
-    if (wantReality) {
-      keys.reality = (await fetchJson('/panel/api/server/getNewX25519Cert')) as {
-        privateKey: string;
-        publicKey: string;
-      };
-    }
-    if (wantMldsa) {
-      keys.mldsa65 = (await fetchJson('/panel/api/server/getNewmldsa65')) as {
-        seed: string;
-        verify: string;
-      };
-    }
-    if (wantVlessEnc) {
-      const obj = (await fetchJson('/panel/api/server/getNewVlessEnc')) as {
-        auths?: { decryption: string; encryption: string; id?: string; label?: string }[];
-      };
-      const block = (obj.auths || []).find(
-        (a) =>
-          (a.label || a.id || '')
-            .toLowerCase()
-            .replace(/[-_\s]/g, '')
-            .includes('mlkem768') &&
-          !(a.label || a.id || '').toLowerCase().includes('xorpub') &&
-          !(a.label || a.id || '').toLowerCase().includes('random'),
-      );
-      if (block)
-        keys.vlessEncMlkem = { decryption: block.decryption, encryption: block.encryption };
-    }
-    return keys;
-  }
+  const gatherKeys = () => gatherListenerKeys(selected);
 
   async function submit() {
     if (selectedTemplates.length === 0) return;
@@ -177,50 +114,28 @@ export default function GenerateListenersModal({
         return;
       }
 
-      const used = new Set(portsInUse.get(target));
-      const creations: PreparedCreate[] = selectedTemplates.map((tpl) => {
-        const port = tpl.fixedPort ?? pickListenerPort(used);
-        if (!tpl.fixedPort) used.add(port);
-        const email = generateTemplateEmail(tpl.id);
-        keys.email = email;
-        const built = tpl.build({ domain, certFile, keyFile, keys, port, email });
-        return {
-          templateId: tpl.id,
-          label: t(tpl.labelKey),
-          payload: {
-            ...built,
-            port,
-            ...(isNodeTarget ? { nodeId: target } : {}),
-          } as TemplatePayload,
-          overwrite: overwriteList.find((ib) => ib.tag === templateTag(tpl.id)) ?? null,
-        };
+      const creations = buildListenerCreations({
+        selectedIds: selected,
+        domain,
+        certFile,
+        keyFile,
+        keys,
+        portsInUse: portsInUse.get(target) ?? new Set<number>(),
+        existing: dbInbounds,
+        nodeId: isNodeTarget ? target : null,
+        labelOf: (id) => {
+          const tpl = LISTENER_TEMPLATES.find((tpl) => tpl.id === id);
+          return tpl ? t(tpl.labelKey) : id;
+        },
       });
-
       // Overwrite pass first: the backend refuses a duplicate tag, so any
       // same-named listener on the target must be deleted before creating.
-      for (const item of creations) {
-        if (item.overwrite) {
-          await HttpUtil.post(`/panel/api/inbounds/del/${item.overwrite.id}`, undefined, {
-            silent: true,
-          });
-        }
-      }
+      await removeOverwrites(creations);
 
-      const results: { label: string; ok: boolean; reason: string }[] = [];
-      for (const item of creations) {
-        const msg = await HttpUtil.post('/panel/api/inbounds/add', item.payload, { silent: true });
-        results.push({
-          label: item.label,
-          ok: !!msg?.success,
-          reason: msg?.success ? '' : msg?.msg || '',
-        });
-      }
-      const okCount = results.filter((r) => r.ok).length;
-      const failed = results.length - okCount;
+      const { okCount, failed, firstError } = await createListenerInbounds(creations);
       if (failed === 0) {
         messageApi?.success(t('pages.inbounds.generate.toasts.createdMany', { count: okCount }));
       } else {
-        const firstError = results.find((r) => !r.ok)?.reason ?? '';
         const base = t('pages.inbounds.generate.toasts.createdMixed', { ok: okCount, failed });
         messageApi?.warning(firstError ? `${base} — ${firstError}` : base);
       }

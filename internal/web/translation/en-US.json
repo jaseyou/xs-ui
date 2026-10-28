@@ -2893,5 +2893,24 @@
     "restartXray": "Restart Xray Service",
     "restartXraySuccess": "Xray has been successfully relaunched",
     "settings": "Settings"
+  },
+  "simpleMode": {
+    "toExpert": "Expert mode",
+    "toSimple": "Simple mode",
+    "toggleTitle": "Toggle between the simplified and the full panel"
+  },
+  "wizard": {
+    "title": "Get started",
+    "step1": "Pick listeners",
+    "step2": "Domain & certificate",
+    "step3": "Confirm",
+    "step1Desc": "Choose the listener templates to create. Recommended ones are marked; you can change everything later.",
+    "step3Desc": "These listeners will be created with fresh keys and random ports (fixed-port templates keep their standard port).",
+    "domainHint": "The domain must resolve to this server. Reality templates use the local camouflage target 127.0.0.1:7443.",
+    "recommended": "recommended",
+    "prev": "Back",
+    "next": "Next",
+    "done": "Created {count} listener(s). You are set!",
+    "noInputsNeeded": "Nothing else to fill in for the selected templates."
   }
 }

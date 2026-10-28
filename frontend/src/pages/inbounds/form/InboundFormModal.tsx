@@ -38,6 +38,7 @@ import {
 } from '@/lib/xray/inbound-tls-defaults';
 import { MASQUE_DEFAULT_PATH } from '@/schemas/protocols/stream/masque';
 import { NODE_ELIGIBLE_PROTOCOLS } from '@/lib/xray/node-protocols';
+import { useSimpleMode } from '@/hooks/useSimpleMode';
 import { VLESS_AUTH_LABEL_KEYS, vlessEncryptionAuthKind } from '@/lib/xray/vless-encryption';
 import { SniffingSchema } from '@/schemas/primitives/sniffing';
 import { TcpStreamSettingsSchema } from '@/schemas/protocols/stream/tcp';
@@ -218,6 +219,9 @@ export default function InboundFormModal({
   availableNodesFetched = true,
 }: InboundFormModalProps) {
   const { t } = useTranslation();
+  // 简单模式下“新建”只保留基础+协议页签,其余字段走 schema 默认值;编辑始终完整,防止静默丢失配置。
+  const { simple } = useSimpleMode();
+  const simpleAdd = simple && mode === 'add';
   const uid = useId();
   const [messageApi, messageContextHolder] = message.useMessage();
   const [modal, modalContextHolder] = Modal.useModal();
@@ -1185,7 +1189,7 @@ export default function InboundFormModal({
                       },
                     ]
                   : []),
-                ...(streamEnabled
+                ...(!simpleAdd && streamEnabled
                   ? [
                       {
                         key: 'stream',
@@ -1205,7 +1209,7 @@ export default function InboundFormModal({
                         : []),
                     ]
                   : []),
-                ...(sniffingSupported
+                ...(!simpleAdd && sniffingSupported
                   ? [
                       {
                         key: 'sniffing',
@@ -1215,12 +1219,16 @@ export default function InboundFormModal({
                       },
                     ]
                   : []),
-                {
-                  key: 'advanced',
-                  label: t('pages.xray.advancedTemplate'),
-                  children: advancedTab,
-                  forceRender: true,
-                },
+                ...(!simpleAdd
+                  ? [
+                      {
+                        key: 'advanced',
+                        label: t('pages.xray.advancedTemplate'),
+                        children: advancedTab,
+                        forceRender: true,
+                      },
+                    ]
+                  : []),
               ]}
             />
           </Form>

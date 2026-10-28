@@ -10,6 +10,7 @@ import { setupHttp } from '@/api/http-init';
 import { readyI18n } from '@/i18n/react';
 import { AntdRootConfig } from '@/i18n/AntdRootConfig';
 import { ThemeProvider } from '@/hooks/useTheme';
+import { SimpleModeProvider } from '@/hooks/useSimpleMode';
 import { QueryProvider } from '@/api/QueryProvider';
 import { router } from '@/routes';
 
@@ -52,9 +53,11 @@ readyI18n().then(() => {
     createRoot(root).render(
       <AntdRootConfig>
         <ThemeProvider>
-          <QueryProvider>
-            <RouterProvider router={router} />
-          </QueryProvider>
+          <SimpleModeProvider>
+            <QueryProvider>
+              <RouterProvider router={router} />
+            </QueryProvider>
+          </SimpleModeProvider>
         </ThemeProvider>
       </AntdRootConfig>,
     );

@@ -83,6 +83,7 @@ export interface InboundListProps {
   onGenerateListeners?: () => void;
   selectedId?: number | null;
   onRowClick?: (id: number) => void;
+  onOpenWizard?: () => void;
   onGeneralAction: (key: GeneralAction) => void;
   onRowAction: (action: { key: RowAction; dbInbound: DBInboundRecord }) => void;
   onBulkDelete: (ids: number[]) => Promise<boolean>;

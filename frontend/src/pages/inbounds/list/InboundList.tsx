@@ -26,6 +26,7 @@ import {
   DeleteOutlined,
   SearchOutlined,
   ThunderboltOutlined,
+  RocketOutlined,
 } from '@ant-design/icons';
 
 import { HttpUtil } from '@/utils';
@@ -65,6 +66,7 @@ export default function InboundList({
   onGenerateListeners,
   selectedId,
   onRowClick,
+  onOpenWizard,
   onGeneralAction,
   onRowAction,
   onBulkDelete,
@@ -234,6 +236,15 @@ export default function InboundList({
           >
             {!isMobile && t('pages.inbounds.addInbound')}
           </Button>
+          {onOpenWizard && dbInbounds.length === 0 && (
+            <Button
+              onClick={onOpenWizard}
+              icon={<RocketOutlined aria-hidden />}
+              aria-label={t('wizard.title')}
+            >
+              {!isMobile && t('wizard.title')}
+            </Button>
+          )}
           {onGenerateListeners && (
             <Button
               onClick={onGenerateListeners}
