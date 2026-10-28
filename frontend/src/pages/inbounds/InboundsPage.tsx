@@ -946,17 +946,15 @@ export default function InboundsPage() {
           />
         </LazyMount>
 
-        <LazyMount when={wizardOpen}>
-          <SetupWizardModal
-            open={wizardOpen || wizardAutoOpen}
-            onClose={closeWizard}
-            onFinished={refresh}
-            dbInbounds={dbInbounds || []}
-            portsInUse={clonePortsInUse.get(0) ?? new Set<number>()}
-            panelCertFile={generatePanelSettings?.webCertFile ?? ''}
-            panelKeyFile={generatePanelSettings?.webKeyFile ?? ''}
-          />
-        </LazyMount>
+        <SetupWizardModal
+          open={wizardOpen || wizardAutoOpen}
+          onClose={closeWizard}
+          onFinished={refresh}
+          dbInbounds={dbInbounds || []}
+          portsInUse={clonePortsInUse.get(0) ?? new Set<number>()}
+          panelCertFile={generatePanelSettings?.webCertFile ?? ''}
+          panelKeyFile={generatePanelSettings?.webKeyFile ?? ''}
+        />
 
         <LazyMount when={generateOpen}>
           <GenerateListenersModal
