@@ -7,12 +7,12 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawg"
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawgnet"
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/tuic"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/common"
+	"github.com/jaseyou/xs-ui/v3/internal/amneziawg"
+	"github.com/jaseyou/xs-ui/v3/internal/amneziawgnet"
+	"github.com/jaseyou/xs-ui/v3/internal/database"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/tuic"
+	"github.com/jaseyou/xs-ui/v3/internal/util/common"
 
 	"gorm.io/gorm"
 )
@@ -33,6 +33,24 @@ func inboundTransports(protocol model.Protocol, streamSettings, settings string)
 		return transportTCP
 	case model.MASQUE:
 		return masqueTransports(streamSettings)
+	case model.Anytls, model.Shadowtls:
+		return transportTCP
+	case model.Naive:
+		// naive over HTTP/3 rides QUIC; plain naive is TCP. The alpn in the
+		// TLS block decides, mirroring the frontend's inbound-tag derivation.
+		if streamSettings != "" {
+			var ss map[string]any
+			if json.Unmarshal([]byte(streamSettings), &ss) == nil {
+				if tlsSettings, _ := ss["tlsSettings"].(map[string]any); tlsSettings != nil {
+					if alpn, _ := tlsSettings["alpn"].([]any); len(alpn) > 0 {
+						if alpn[0] == "h3" {
+							return transportUDP
+						}
+					}
+				}
+			}
+		}
+		return transportTCP
 	}
 
 	var bits transportBits

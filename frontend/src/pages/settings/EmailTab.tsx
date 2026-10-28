@@ -5,6 +5,7 @@ import { MailOutlined, SendOutlined, SettingOutlined } from '@ant-design/icons';
 import { HttpUtil } from '@/utils';
 import { onNumber } from '@/utils/onNumber';
 import type { AllSetting } from '@/models/setting';
+import { BRAND_NAME } from '@/lib/branding';
 import { DefaultSettingTag, SettingListItem } from '@/components/ui';
 import { EmailNotifications } from '@/components/ui/notifications/EmailNotifications';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
@@ -151,7 +152,7 @@ export default function EmailTab({ allSetting, updateSetting }: EmailTabProps) {
               >
                 <Input
                   value={allSetting.smtpFromName}
-                  placeholder="3x-ui"
+                  placeholder={BRAND_NAME}
                   onChange={(e) => updateSetting({ smtpFromName: e.target.value })}
                 />
               </SettingListItem>

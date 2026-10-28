@@ -80,6 +80,9 @@ export interface InboundListProps {
   hasActiveNode: boolean;
   hosts: HostRecord[];
   onAddInbound: () => void;
+  onGenerateListeners?: () => void;
+  selectedId?: number | null;
+  onRowClick?: (id: number) => void;
   onGeneralAction: (key: GeneralAction) => void;
   onRowAction: (action: { key: RowAction; dbInbound: DBInboundRecord }) => void;
   onBulkDelete: (ids: number[]) => Promise<boolean>;

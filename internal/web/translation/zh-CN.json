@@ -785,7 +785,46 @@
         "peerNumberConfig": "Peer {n} 配置"
       },
       "sniffingDestOverride": "目标覆盖",
-      "advancedTitle": "高级设置"
+      "advancedTitle": "高级设置",
+      "generate": {
+        "title": "一键生成常用监听器",
+        "intro": "选择 VPS 和实践模板后批量创建并部署。若该目标上已有同名常用监听器,创建前会请你确认覆盖。",
+        "target": "VPS",
+        "selected": "已选",
+        "domain": "域名(自域名模板)",
+        "certFile": "证书文件",
+        "keyFile": "私钥文件",
+        "domainRequired": "所选模板需要填写域名",
+        "certRequired": "所选模板需要填写证书和私钥路径",
+        "selectAllFree": "全选(免证书模板)",
+        "portFixed": "{port}/TCP",
+        "portRandom": "随机 {type}",
+        "create": "生成",
+        "nodeSingboxNote": "sing-box 类模板(AnyTLS / ShadowTLS / Naive / Salamander)当前版本仅支持部署到本机面板。",
+        "singboxNote": "sing-box 类模板需要面板主机上已安装 sing-box(随 xray 一并安装,或通过 XUI_SINGBOX_BIN 指定路径)。Reality 自域名模板使用本机伪装站 127.0.0.1:7443,无需证书;普通 TLS 模板默认使用面板证书,创建后可再修改。",
+        "overwriteTitle": "将覆盖 {count} 个同名监听器",
+        "templates": {
+          "realityVision": "VLESS-Reality-Vision(自域名)",
+          "tlsPqcXhttp": "TLS+后量子+XHTTP+CDN",
+          "tlsPqcVisionXhttp": "TLS+后量子+Vision+XHTTP+CDN",
+          "realityMldsaVision": "REALITY+后量子+Vision(自域名)",
+          "shadowtlsSs2022": "ShadowTLS-SS2022(自域名)",
+          "anytlsTls": "AnyTLS-TLS",
+          "anytlsReality": "AnyTLS-Reality(自域名)",
+          "hysteria2Salamander": "Hysteria2-TLS-BBR-Salamander",
+          "tuicBbr": "TUIC-TLS-BBR",
+          "naiveQuic": "Naive-TLS-QUIC",
+          "naiveTcp": "Naive-TLS-TCP"
+        },
+        "toasts": {
+          "keyGenFailed": "密钥生成失败:{error}",
+          "createdMany": "已创建 {count} 个监听器",
+          "createdMixed": "成功 {ok} 个,失败 {failed} 个"
+        }
+      },
+      "detail": {
+        "empty": "选择入站查看详情"
+      }
     },
     "clients": {
       "tabBasics": "基本",

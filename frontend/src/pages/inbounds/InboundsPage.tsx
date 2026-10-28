@@ -38,9 +38,10 @@ import { useTheme } from '@/hooks/useTheme';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { useNodesQuery } from '@/api/queries/useNodesQuery';
+import { useAllSettings } from '@/api/queries/useAllSettings';
 import { useHostsQuery } from '@/api/queries/useHostsQuery';
 import { withHostEndpoints } from '@/lib/hosts/host-link';
-import AppSidebar from '@/layouts/AppSidebar';
+import AppTopbar from '@/layouts/AppTopbar';
 const TextModal = lazy(() => import('@/components/feedback/TextModal'));
 import type { TextModalTab } from '@/components/feedback/TextModal';
 const PromptModal = lazy(() => import('@/components/feedback/PromptModal'));
@@ -50,6 +51,8 @@ import { InboundList } from './list';
 import { LazyMount } from '@/components/utility';
 const InboundFormModal = lazy(() => import('./form/InboundFormModal'));
 const CloneInboundModal = lazy(() => import('./CloneInboundModal'));
+const GenerateListenersModal = lazy(() => import('./GenerateListenersModal'));
+const InboundDetailPanel = lazy(() => import('./InboundDetailPanel'));
 const InboundInfoModal = lazy(() => import('./info/InboundInfoModal'));
 const AttachClientsModal = lazy(() => import('./clients/AttachClientsModal'));
 const AttachExistingClientsModal = lazy(() => import('./clients/AttachExistingClientsModal'));
@@ -110,6 +113,7 @@ export default function InboundsPage() {
   useEffect(() => {
     setMessageInstance(messageApi);
   }, [messageApi]);
+  const { allSetting: generatePanelSettings } = useAllSettings();
 
   const { nodes: nodesList, fetched: nodesFetched } = useNodesQuery();
   // MTProto share links are generated from this list, so an empty one must mean
@@ -176,6 +180,13 @@ export default function InboundsPage() {
   const [groupSource, setGroupSource] = useState<DBInbound | null>(null);
 
   const [cloneOpen, setCloneOpen] = useState(false);
+  const [generateOpen, setGenerateOpen] = useState(false);
+  // List + detail split: the row clicked on the left drives the right panel.
+  const [detailId, setDetailId] = useState<number | null>(null);
+  const detailInbound = useMemo(
+    () => (dbInbounds ?? []).find((ib) => ib.id === detailId) ?? null,
+    [dbInbounds, detailId],
+  );
   const [cloneSource, setCloneSource] = useState<DBInbound | null>(null);
 
   const [textOpen, setTextOpen] = useState(false);
@@ -463,6 +474,10 @@ export default function InboundsPage() {
     setFormOpen(true);
   }, []);
 
+  const onGenerateListeners = useCallback(() => {
+    setGenerateOpen(true);
+  }, []);
+
   const openEdit = useCallback((dbInbound: DBInbound) => {
     setFormMode('edit');
     setFormDbInbound(dbInbound);
@@ -714,7 +729,7 @@ export default function InboundsPage() {
       {messageContextHolder}
       {modalContextHolder}
       <Layout className={`inbounds-page${isDark ? ' is-dark' : ''}${isUltra ? ' is-ultra' : ''}`}>
-        <AppSidebar />
+        <AppTopbar />
 
         <Layout className="content-shell">
           <Layout.Content id="content-layout" className="content-area">
@@ -782,27 +797,59 @@ export default function InboundsPage() {
                   </Col>
 
                   <Col span={24}>
-                    <InboundList
-                      dbInbounds={dbInbounds}
-                      clientCount={clientCount}
-                      onlineClients={onlineClients}
-                      lastOnlineMap={lastOnlineMap}
-                      inboundSpeed={inboundSpeed}
-                      expireDiff={expireDiff}
-                      trafficDiff={trafficDiff}
-                      pageSize={pageSize}
-                      isMobile={isMobile}
-                      subEnable={subSettings.enable}
-                      nodesById={nodesById}
-                      hasActiveNode={showNodeInfo}
-                      hosts={hosts}
-                      onAddInbound={onAddInbound}
-                      onGeneralAction={onGeneralAction}
-                      onRowAction={({ key, dbInbound }) =>
-                        onRowAction({ key, dbInbound: dbInbound as unknown as DBInbound })
-                      }
-                      onBulkDelete={confirmBulkDelete}
-                    />
+                    <Row gutter={[isMobile ? 8 : 16, 12]} align="top">
+                      <Col xs={24} xl={16}>
+                        <InboundList
+                          dbInbounds={dbInbounds}
+                          clientCount={clientCount}
+                          onlineClients={onlineClients}
+                          lastOnlineMap={lastOnlineMap}
+                          inboundSpeed={inboundSpeed}
+                          expireDiff={expireDiff}
+                          trafficDiff={trafficDiff}
+                          pageSize={pageSize}
+                          isMobile={isMobile}
+                          subEnable={subSettings.enable}
+                          nodesById={nodesById}
+                          hasActiveNode={showNodeInfo}
+                          hosts={hosts}
+                          onAddInbound={onAddInbound}
+                          onGenerateListeners={onGenerateListeners}
+                          selectedId={detailId}
+                          onRowClick={setDetailId}
+                          onGeneralAction={onGeneralAction}
+                          onRowAction={({ key, dbInbound }) =>
+                            onRowAction({ key, dbInbound: dbInbound as unknown as DBInbound })
+                          }
+                          onBulkDelete={confirmBulkDelete}
+                        />
+                      </Col>
+                      <Col xs={24} xl={8}>
+                        <InboundDetailPanel
+                          inbound={detailInbound}
+                          clientCount={detailInbound ? clientCount[detailInbound.id] : undefined}
+                          onlineClients={onlineClients}
+                          speed={detailInbound ? inboundSpeed[detailInbound.id] : undefined}
+                          onRowAction={(key, dbInbound) =>
+                            onRowAction({ key, dbInbound: dbInbound as unknown as DBInbound })
+                          }
+                          onToggleEnable={async (dbInbound, next) => {
+                            dbInbound.enable = next;
+                            try {
+                              const formData = new FormData();
+                              formData.append('enable', String(next));
+                              const msg = await HttpUtil.post(
+                                `/panel/api/inbounds/setEnable/${dbInbound.id}`,
+                                formData,
+                              );
+                              if (!msg?.success) dbInbound.enable = !next;
+                            } catch {
+                              dbInbound.enable = !next;
+                            }
+                          }}
+                        />
+                      </Col>
+                    </Row>
                   </Col>
                 </Row>
               )}
@@ -879,6 +926,19 @@ export default function InboundsPage() {
             dbInbound={cloneSource}
             nodes={nodesList || []}
             portsInUse={clonePortsInUse}
+          />
+        </LazyMount>
+
+        <LazyMount when={generateOpen}>
+          <GenerateListenersModal
+            open={generateOpen}
+            onClose={() => setGenerateOpen(false)}
+            onGenerated={refresh}
+            nodes={nodesList || []}
+            dbInbounds={dbInbounds || []}
+            portsInUse={clonePortsInUse}
+            panelCertFile={generatePanelSettings?.webCertFile ?? ''}
+            panelKeyFile={generatePanelSettings?.webKeyFile ?? ''}
           />
         </LazyMount>
 

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/jaseyou/xs-ui/v3/internal/xray"
 )
 
 // A single getSubs entry can hold several links (one per host of an inbound)

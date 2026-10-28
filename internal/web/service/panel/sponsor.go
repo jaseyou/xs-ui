@@ -15,12 +15,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/config"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
+	"github.com/jaseyou/xs-ui/v3/internal/config"
+	"github.com/jaseyou/xs-ui/v3/internal/logger"
+	"github.com/jaseyou/xs-ui/v3/internal/web/service"
 )
 
-// Sponsor is one paid placement published in the repo's sponsors.json.
+// Sponsor is one paid placement published by the configured sponsor source.
 type Sponsor struct {
 	ID     string            `json:"id" example:"acme-2026-10"`
 	Name   string            `json:"name" example:"Acme VPS"`
@@ -60,8 +60,12 @@ type sponsorLogo struct {
 }
 
 var (
-	sponsorsURL     = "https://raw.githubusercontent.com/MHSanaei/sponsors/refs/heads/main/3X/sponsors.json"
-	sponsorLogoBase = "https://raw.githubusercontent.com/MHSanaei/sponsors/refs/heads/main/3X/logos/"
+	// Sponsor slots are self-hosted: point XUI_SPONSORS_URL at your own
+	// sponsors.json (same schema as SponsorList) and XUI_SPONSORS_LOGO_BASE at
+	// the matching logo directory (must end with "/"). Nothing is fetched and
+	// no sponsor is served while these are unset, so a fresh build shows no ads.
+	sponsorsURL     = os.Getenv("XUI_SPONSORS_URL")
+	sponsorLogoBase = os.Getenv("XUI_SPONSORS_LOGO_BASE")
 	sponsorNow      = time.Now
 
 	// The panel proxies logos from sponsorLogoBase: CSP stays 'self' and no third party sees admin IPs.
@@ -112,6 +116,9 @@ func cachedSponsors() (*SponsorList, error) {
 func (s *PanelService) GetSponsorLogo(name string) ([]byte, string, error) {
 	// Validated here, not only via list membership, so name can never carry a path or URL.
 	if !sponsorLogoRe.MatchString(name) {
+		return nil, "", ErrSponsorLogoUnknown
+	}
+	if sponsorLogoBase == "" && !config.IsDebug() {
 		return nil, "", ErrSponsorLogoUnknown
 	}
 	sponsors, err := s.GetSponsors()
@@ -197,6 +204,10 @@ func fetchLimited(url string, limit int) ([]byte, error) {
 }
 
 func fetchSponsors() (*SponsorList, error) {
+	if sponsorsURL == "" && !config.IsDebug() {
+		// No sponsor source configured: the slot mechanism stays available but serves nothing.
+		return &SponsorList{Sponsors: []Sponsor{}}, nil
+	}
 	body, err := readSponsorSource(sponsorsURL, filepath.Join(localSponsorsDir, "sponsors.json"), maxSponsorsBytes)
 	if err != nil {
 		return nil, err

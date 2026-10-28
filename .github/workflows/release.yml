@@ -171,6 +171,28 @@ jobs:
               rm -rf "${MTG_PKG}" "${MTG_PKG}.tar.gz"
               ;;
           esac
+          # sing-box sidecar (anytls / shadowtls / naive / hysteria2-salamander
+          # templates). Optional dependency: the panel runs fine without it and
+          # reports exactly which path it looked at, so platforms without an
+          # upstream sing-box build skip gracefully instead of failing the run.
+          SINGBOX_VER=$(curl -sf $CURL_RETRY -o /dev/null -w '%{redirect_url}' "https://github.com/SagerNet/sing-box/releases/latest" | sed -n 's#.*/releases/tag/##p')
+          if [ -n "$SINGBOX_VER" ]; then
+            SINGBOX_ARCH="${{ matrix.platform }}"
+            SINGBOX_BIN_ARCH="${SINGBOX_ARCH}"
+            if [ "${SINGBOX_ARCH}" = "amd64v3" ]; then SINGBOX_ARCH="amd64"; fi
+            SINGBOX_PKG="sing-box-${SINGBOX_VER#v}-linux-${SINGBOX_ARCH}"
+            if curl -sfL $CURL_RETRY -o singbox.tar.gz "https://github.com/SagerNet/sing-box/releases/download/${SINGBOX_VER}/${SINGBOX_PKG}.tar.gz"; then
+              tar -xzf singbox.tar.gz
+              mv "${SINGBOX_PKG}/sing-box" "sing-box-linux-${SINGBOX_BIN_ARCH}"
+              chmod +x "sing-box-linux-${SINGBOX_BIN_ARCH}"
+              rm -rf "${SINGBOX_PKG}" singbox.tar.gz
+            else
+              echo "no sing-box linux-${SINGBOX_ARCH} build; skipping (panel runs without the sidecar)"
+              rm -f singbox.tar.gz
+            fi
+          else
+            echo "could not resolve the latest sing-box release tag; skipping sidecar binary"
+          fi
           cd ../..
 
       - name: Package

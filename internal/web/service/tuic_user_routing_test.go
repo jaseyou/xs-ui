@@ -26,10 +26,10 @@ import (
 	_ "github.com/xtls/xray-core/proxy/freedom"
 	_ "github.com/xtls/xray-core/proxy/socks"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/tuic"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/jaseyou/xs-ui/v3/internal/database"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/tuic"
+	"github.com/jaseyou/xs-ui/v3/internal/xray"
 )
 
 const tuicRoutingProbe = "tuic-route-probe"

@@ -13,7 +13,7 @@ import (
 	"testing/synctest"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/dbtest"
+	"github.com/jaseyou/xs-ui/v3/internal/database/dbtest"
 )
 
 // A box with no IPv6 route spends 3s per lookup service, and a status sample

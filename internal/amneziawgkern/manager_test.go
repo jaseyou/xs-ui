@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	wgutil "github.com/mhsanaei/3x-ui/v3/internal/util/wireguard"
+	wgutil "github.com/jaseyou/xs-ui/v3/internal/util/wireguard"
 )
 
 const (

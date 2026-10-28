@@ -13,9 +13,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/common"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/netsafe"
+	"github.com/jaseyou/xs-ui/v3/internal/logger"
+	"github.com/jaseyou/xs-ui/v3/internal/util/common"
+	"github.com/jaseyou/xs-ui/v3/internal/util/netsafe"
 )
 
 const (

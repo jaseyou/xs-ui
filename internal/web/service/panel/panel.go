@@ -17,11 +17,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/config"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/version"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/global"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
+	"github.com/jaseyou/xs-ui/v3/internal/config"
+	"github.com/jaseyou/xs-ui/v3/internal/logger"
+	"github.com/jaseyou/xs-ui/v3/internal/util/version"
+	"github.com/jaseyou/xs-ui/v3/internal/web/global"
+	"github.com/jaseyou/xs-ui/v3/internal/web/service"
 )
 
 // PanelService provides business logic for panel management operations.
@@ -40,9 +40,19 @@ type PanelUpdateInfo struct {
 	UpdateAvailable bool   `json:"updateAvailable"`
 }
 
-const (
-	panelUpdaterURL      = "https://raw.githubusercontent.com/MHSanaei/3x-ui/main/update.sh"
-	maxPanelUpdaterBytes = 2 << 20
+// envOr returns the environment variable named key, or fallback when unset/empty.
+func envOr(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
+}
+
+var (
+	// Self-update sources are configurable so a fork can point at its own
+	// releases instead of being updated back onto upstream.
+	panelUpdaterURL  = envOr("XUI_PANEL_UPDATE_URL", "https://raw.githubusercontent.com/jaseyou/xs-ui/main/update.sh")
+	panelReleaseRepo = envOr("XUI_UPDATE_REPO", "jaseyou/xs-ui")
 	// devReleaseTag is the fixed-tag rolling pre-release the CI force-moves to the
 	// newest main commit; the dev update channel installs from it.
 	devReleaseTag = "dev-latest"
@@ -51,6 +61,8 @@ const (
 	updateStateSuccess = "success"
 	updateStateFailed  = "failed"
 )
+
+const maxPanelUpdaterBytes = 2 << 20
 
 // PanelUpdateStatus reports the outcome of the most recently launched panel
 // self-update. RunID lets the caller confirm this status belongs to the
@@ -431,9 +443,9 @@ func fetchLatestPanelVersion() (string, error) {
 // fetchPanelRelease fetches a release from GitHub. An empty tag resolves the
 // latest stable release; a non-empty tag (e.g. dev-latest) resolves that tag.
 func fetchPanelRelease(tag string) (*service.Release, error) {
-	url := "https://api.github.com/repos/MHSanaei/3x-ui/releases/latest"
+	url := "https://api.github.com/repos/" + panelReleaseRepo + "/releases/latest"
 	if tag != "" {
-		url = "https://api.github.com/repos/MHSanaei/3x-ui/releases/tags/" + tag
+		url = "https://api.github.com/repos/" + panelReleaseRepo + "/releases/tags/" + tag
 	}
 	client := (&service.SettingService{}).NewProxiedHTTPClient(10 * time.Second)
 	req, reqErr := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)

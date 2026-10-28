@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/middleware"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service/panel"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service/tgbot"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/session"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/web/middleware"
+	"github.com/jaseyou/xs-ui/v3/internal/web/service/panel"
+	"github.com/jaseyou/xs-ui/v3/internal/web/service/tgbot"
+	"github.com/jaseyou/xs-ui/v3/internal/web/session"
 
 	"github.com/gin-gonic/gin"
 )

@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import { theme as antdTheme } from 'antd';
 import type { ThemeConfig } from 'antd';
 
+import { BRAND_COLOR, BRAND_COLOR_HOVER, BRAND_COLOR_ACTIVE } from '@/lib/branding';
+
 const STORAGE_DARK = 'dark-mode';
 const STORAGE_ULTRA = 'isUltraDarkThemeEnabled';
 
@@ -39,12 +41,14 @@ const DARK_TOKENS = {
   colorBgLayout: '#1a1b1f',
   colorBgContainer: '#23252b',
   colorBgElevated: '#2d2f37',
+  colorPrimary: BRAND_COLOR,
 };
 const ULTRA_DARK_TOKENS = {
   colorBgBase: '#000',
   colorBgLayout: '#000',
   colorBgContainer: '#101013',
   colorBgElevated: '#1a1a1e',
+  colorPrimary: BRAND_COLOR,
 };
 const DARK_LAYOUT_TOKENS = {
   bodyBg: '#1a1b1f',
@@ -93,9 +97,9 @@ const LIGHT_CONTRAST_TOKENS = {
   colorSuccessText: '#237804',
 };
 const LIGHT_BUTTON_TOKENS = {
-  colorPrimary: '#0958d9',
-  colorPrimaryHover: '#2468e5',
-  colorPrimaryActive: '#073ea8',
+  colorPrimary: BRAND_COLOR,
+  colorPrimaryHover: BRAND_COLOR_HOVER,
+  colorPrimaryActive: BRAND_COLOR_ACTIVE,
 };
 
 // hashed:false drops the `:where(.css-<hash>)` wrapper antd puts around every

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
+	"github.com/jaseyou/xs-ui/v3/internal/logger"
 )
 
 func TestNormalizeCongestionControl(t *testing.T) {

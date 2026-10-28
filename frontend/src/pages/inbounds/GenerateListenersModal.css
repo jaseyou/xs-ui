@@ -1,0 +1,22 @@
+
+.gen-field {
+  margin-bottom: 10px;
+}
+.gen-field-label {
+  display: block;
+  font-size: 12.5px;
+  color: var(--ant-color-text-tertiary);
+  margin-bottom: 5px;
+}
+.gen-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 13.5px;
+  color: var(--ant-color-primary);
+  cursor: pointer;
+}
+.gen-link:hover {
+  text-decoration: underline;
+}

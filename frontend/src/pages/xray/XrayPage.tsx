@@ -21,7 +21,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useXraySetting } from '@/hooks/useXraySetting';
 import type { XraySettingsValue } from '@/hooks/useXraySetting';
-import AppSidebar from '@/layouts/AppSidebar';
+import AppTopbar from '@/layouts/AppTopbar';
 import { JsonEditor } from '@/components/form';
 import { setMessageInstance } from '@/utils/messageBus';
 
@@ -314,7 +314,7 @@ export default function XrayPage() {
     <ConfigProvider theme={antdThemeConfig}>
       {messageContextHolder}
       <Layout className={pageClass}>
-        <AppSidebar />
+        <AppTopbar />
 
         <Layout className="content-shell">
           <Layout.Content id="content-layout" className="content-area">

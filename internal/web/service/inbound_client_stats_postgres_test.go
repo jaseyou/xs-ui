@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/testpg"
+	"github.com/jaseyou/xs-ui/v3/internal/testpg"
 )
 
 func TestClientStatsIdentitiesPostgres(t *testing.T) {

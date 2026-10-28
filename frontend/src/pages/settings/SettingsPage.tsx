@@ -1,20 +1,30 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import {
   Alert,
   Button,
   Card,
   Col,
   ConfigProvider,
-  FloatButton,
   Layout,
+  Menu,
   Modal,
   Row,
-  Space,
   Spin,
   message,
 } from 'antd';
+import type { MenuProps } from 'antd';
+import {
+  ApartmentOutlined,
+  CloudServerOutlined,
+  CodeOutlined,
+  DiscordOutlined,
+  MailOutlined,
+  SafetyOutlined,
+  SettingOutlined,
+  TelegramFilled,
+} from '@ant-design/icons';
 
 import { HttpUtil, PromiseUtil } from '@/utils';
 import { setMessageInstance } from '@/utils/messageBus';
@@ -22,7 +32,7 @@ import { useTheme } from '@/hooks/useTheme';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useAllSettings } from '@/api/queries/useAllSettings';
 import { AllSettingSchema } from '@/schemas/setting';
-import AppSidebar from '@/layouts/AppSidebar';
+import AppTopbar from '@/layouts/AppTopbar';
 import GeneralTab from './GeneralTab';
 import SecurityTab from './SecurityTab';
 import TelegramTab from './TelegramTab';
@@ -62,10 +72,6 @@ function isIp(h: string): boolean {
   if (![...head, ...tail].every(valid)) return false;
   const groups = head.length + tail.length;
   return parts.length === 2 ? groups < 8 : groups === 8;
-}
-
-function scrollTarget() {
-  return document.getElementById('content-layout') as HTMLElement;
 }
 
 export default function SettingsPage() {
@@ -205,6 +211,57 @@ export default function SettingsPage() {
     return classes.join(' ');
   }, [isDark, isUltra]);
 
+  const navigate = useNavigate();
+  const settingsNavItems = useMemo<MenuProps['items']>(() => {
+    const items: MenuProps['items'] = [
+      {
+        key: 'general',
+        icon: <SettingOutlined aria-hidden />,
+        label: t('pages.settings.panelSettings'),
+      },
+      {
+        key: 'security',
+        icon: <SafetyOutlined aria-hidden />,
+        label: t('pages.settings.securitySettings'),
+      },
+      {
+        key: 'telegram',
+        icon: <TelegramFilled aria-hidden />,
+        label: t('pages.settings.TGBotSettings'),
+      },
+      {
+        key: 'email',
+        icon: <MailOutlined aria-hidden />,
+        label: t('pages.settings.emailSettings'),
+      },
+      {
+        key: 'discord',
+        icon: <DiscordOutlined aria-hidden />,
+        label: t('pages.settings.discordSettings'),
+      },
+      {
+        key: 'subscription',
+        icon: <CloudServerOutlined aria-hidden />,
+        label: t('pages.settings.subSettings'),
+      },
+    ];
+    if (allSetting.subJsonEnable || allSetting.subClashEnable) {
+      items.push({
+        key: 'subscription-formats',
+        icon: <CodeOutlined aria-hidden />,
+        label: t('menu.subFormats'),
+      });
+    }
+    if (allSetting.subJsonEnable) {
+      items.push({
+        key: 'subscription-balancers',
+        icon: <ApartmentOutlined aria-hidden />,
+        label: t('pages.settings.subBalancers.menu'),
+      });
+    }
+    return items;
+  }, [t, allSetting.subJsonEnable, allSetting.subClashEnable]);
+
   const categoryBody = useMemo(() => {
     switch (activeSlug) {
       case 'security':
@@ -237,7 +294,7 @@ export default function SettingsPage() {
       {messageContextHolder}
       {modalContextHolder}
       <Layout className={pageClass}>
-        <AppSidebar />
+        <AppTopbar />
 
         <Layout className="content-shell">
           <Layout.Content id="content-layout" className="content-area">
@@ -272,33 +329,33 @@ export default function SettingsPage() {
                   )}
 
                   <Row gutter={[isMobile ? 8 : 16, isMobile ? 0 : 12]}>
-                    <Col span={24}>
-                      <Card hoverable>
-                        <Row className="header-row">
-                          <Col xs={24} sm={10} className="header-actions">
-                            <Space>
-                              <Button type="primary" disabled={saveDisabled} onClick={onSave}>
-                                {t('pages.settings.save')}
-                              </Button>
-                              <Button
-                                type="primary"
-                                danger
-                                disabled={!saveDisabled}
-                                onClick={restartPanel}
-                              >
-                                {t('pages.settings.restartPanel')}
-                              </Button>
-                            </Space>
-                          </Col>
-                          <Col xs={24} sm={14} className="header-info">
-                            <FloatButton.BackTop target={scrollTarget} visibilityHeight={200} />
-                            <Alert type="warning" showIcon title={t('pages.settings.infoDesc')} />
-                          </Col>
-                        </Row>
+                    <Col xs={24} md={6} xl={5}>
+                      <Card hoverable className="settings-nav-card">
+                        <Menu
+                          mode="inline"
+                          items={settingsNavItems}
+                          selectedKeys={[activeSlug]}
+                          onClick={({ key }) => navigate(`/settings#${String(key)}`)}
+                          inlineCollapsed={false}
+                        />
+                        <div className="settings-nav-actions">
+                          <Button type="primary" block disabled={saveDisabled} onClick={onSave}>
+                            {t('pages.settings.save')}
+                          </Button>
+                          <Button
+                            block
+                            danger
+                            type="primary"
+                            disabled={!saveDisabled}
+                            onClick={restartPanel}
+                          >
+                            {t('pages.settings.restartPanel')}
+                          </Button>
+                        </div>
                       </Card>
                     </Col>
 
-                    <Col span={24}>
+                    <Col xs={24} md={18} xl={19}>
                       <Card hoverable>{categoryBody}</Card>
                     </Col>
                   </Row>

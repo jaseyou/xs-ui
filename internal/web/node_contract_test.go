@@ -15,14 +15,14 @@ import (
 
 	"github.com/robfig/cron/v3"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/dbtest"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/crypto"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/global"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/runtime"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/jaseyou/xs-ui/v3/internal/database"
+	"github.com/jaseyou/xs-ui/v3/internal/database/dbtest"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/util/crypto"
+	"github.com/jaseyou/xs-ui/v3/internal/web/global"
+	"github.com/jaseyou/xs-ui/v3/internal/web/runtime"
+	"github.com/jaseyou/xs-ui/v3/internal/web/service"
+	"github.com/jaseyou/xs-ui/v3/internal/xray"
 )
 
 // nodeUnderContract serves the production router as a node and records every

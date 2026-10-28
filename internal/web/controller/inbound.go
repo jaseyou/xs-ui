@@ -6,14 +6,14 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawgkern"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/wirecodec"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/middleware"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/session"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/websocket"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/jaseyou/xs-ui/v3/internal/amneziawgkern"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/util/wirecodec"
+	"github.com/jaseyou/xs-ui/v3/internal/web/middleware"
+	"github.com/jaseyou/xs-ui/v3/internal/web/service"
+	"github.com/jaseyou/xs-ui/v3/internal/web/session"
+	"github.com/jaseyou/xs-ui/v3/internal/web/websocket"
+	"github.com/jaseyou/xs-ui/v3/internal/xray"
 
 	"github.com/gin-gonic/gin"
 )

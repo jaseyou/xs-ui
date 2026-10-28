@@ -33,6 +33,7 @@ import {
 } from '@ant-design/icons';
 
 import { ClipboardManager, HttpUtil, SizeFormatter } from '@/utils';
+import { BRAND_NAME } from '@/lib/branding';
 import { activateOnKey } from '@/utils/a11y';
 import { useInboundOptions } from '@/api/queries/useInboundOptions';
 import { useAllSettings } from '@/api/queries/useAllSettings';
@@ -355,7 +356,7 @@ export default function CommandPalette() {
         category: 'inbounds',
         title: ib.remark || ib.tag || `Inbound #${ib.id}`,
         subtitle: `Port ${ib.port || ''}`,
-        icon: <ImportOutlined aria-hidden style={{ color: '#1677ff' }} />,
+        icon: <ImportOutlined aria-hidden style={{ color: '#722ed1' }} />,
         tag:
           tags.length > 0 ? (
             <div style={{ display: 'inline-flex', gap: 4, flexWrap: 'wrap' }}>{tags}</div>
@@ -757,7 +758,7 @@ export default function CommandPalette() {
                 {t('close')}
               </span>
             </div>
-            <span>3x-ui Command Palette</span>
+            <span>{BRAND_NAME} Command Palette</span>
           </div>
         </div>
       </div>

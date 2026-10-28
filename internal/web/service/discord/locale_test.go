@@ -8,8 +8,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/eventbus"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/locale"
+	"github.com/jaseyou/xs-ui/v3/internal/eventbus"
+	"github.com/jaseyou/xs-ui/v3/internal/web/locale"
 )
 
 type fixedTgLang struct{}
@@ -25,7 +25,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestDiscordMessagesFollowDiscordLang(t *testing.T) {
-	const lang = "ru-RU"
+	const lang = "zh-CN"
 	settingService := setupTestDB(t)
 	_ = settingService.SetDiscordLang(lang)
 	_ = settingService.SetDiscordBotToken("token")

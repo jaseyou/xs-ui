@@ -9,14 +9,14 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/netsafe"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/entity"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/global"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service/panel"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/websocket"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/logger"
+	"github.com/jaseyou/xs-ui/v3/internal/util/netsafe"
+	"github.com/jaseyou/xs-ui/v3/internal/web/entity"
+	"github.com/jaseyou/xs-ui/v3/internal/web/global"
+	"github.com/jaseyou/xs-ui/v3/internal/web/service"
+	"github.com/jaseyou/xs-ui/v3/internal/web/service/panel"
+	"github.com/jaseyou/xs-ui/v3/internal/web/websocket"
 
 	"github.com/gin-gonic/gin"
 )

@@ -8,6 +8,7 @@ import { renderWithProviders } from './test-utils';
 import { installPointerEvents, pointAt } from './pointer-events';
 
 vi.mock('@/layouts/AppSidebar', () => ({ default: () => null }));
+vi.mock('@/layouts/AppTopbar', () => ({ default: () => null }));
 vi.mock('@/pages/hosts/HostFormModal', () => ({ default: () => null }));
 
 const initial = [

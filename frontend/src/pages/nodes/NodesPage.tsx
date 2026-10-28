@@ -30,7 +30,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useNodesQuery } from '@/api/queries/useNodesQuery';
 import type { NodeRecord } from '@/api/queries/useNodesQuery';
 import { useNodeMutations } from '@/api/queries/useNodeMutations';
-import AppSidebar from '@/layouts/AppSidebar';
+import AppTopbar from '@/layouts/AppTopbar';
 import NodeList from './NodeList';
 import NodeFormModal from './NodeFormModal';
 import { setMessageInstance } from '@/utils/messageBus';
@@ -286,7 +286,7 @@ export default function NodesPage() {
       {messageContextHolder}
       {modalContextHolder}
       <Layout className={pageClass}>
-        <AppSidebar />
+        <AppTopbar />
 
         <Layout className="content-shell">
           <Layout.Content id="content-layout" className="content-area">

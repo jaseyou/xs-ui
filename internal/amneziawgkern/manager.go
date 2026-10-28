@@ -13,8 +13,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawg"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
+	"github.com/jaseyou/xs-ui/v3/internal/amneziawg"
+	"github.com/jaseyou/xs-ui/v3/internal/logger"
 )
 
 // commandTimeout bounds every awg/ip/nft/iptables invocation.

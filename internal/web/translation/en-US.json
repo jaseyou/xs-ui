@@ -785,7 +785,46 @@
         "peerNumber": "Peer {n}",
         "peerNumberConfig": "Peer {n} config"
       },
-      "sniffingDestOverride": "Destination override"
+      "sniffingDestOverride": "Destination override",
+      "generate": {
+        "title": "One-click common listeners",
+        "intro": "Pick a target and the templates to batch-create. Same-named listeners already on the target are offered for overwrite before creation.",
+        "target": "Target (VPS)",
+        "selected": "Selected",
+        "domain": "Domain (for self-domain templates)",
+        "certFile": "Certificate file",
+        "keyFile": "Private key file",
+        "domainRequired": "A domain is required by the selected templates",
+        "certRequired": "Certificate and private key paths are required by the selected templates",
+        "selectAllFree": "Select all (no-cert templates)",
+        "portFixed": "{port}/TCP",
+        "portRandom": "Random {type}",
+        "create": "Create",
+        "nodeSingboxNote": "sing-box templates (AnyTLS / ShadowTLS / Naive / Salamander) can only be deployed to the local panel in this version.",
+        "singboxNote": "sing-box templates need the sing-box binary on the panel host (installed alongside xray, or point XUI_SINGBOX_BIN at it). Reality self-domain templates use the local camouflage target 127.0.0.1:7443 and need no certificate; TLS templates default to the panel certificate and can be edited afterwards.",
+        "overwriteTitle": "{count} same-named listener(s) will be overwritten",
+        "templates": {
+          "realityVision": "VLESS-Reality-Vision (self-domain)",
+          "tlsPqcXhttp": "TLS+PQC+XHTTP+CDN",
+          "tlsPqcVisionXhttp": "TLS+PQC+Vision+XHTTP+CDN",
+          "realityMldsaVision": "REALITY+PQC+Vision (self-domain)",
+          "shadowtlsSs2022": "ShadowTLS-SS2022 (self-domain)",
+          "anytlsTls": "AnyTLS-TLS",
+          "anytlsReality": "AnyTLS-Reality (self-domain)",
+          "hysteria2Salamander": "Hysteria2-TLS-BBR-Salamander",
+          "tuicBbr": "TUIC-TLS-BBR",
+          "naiveQuic": "Naive-TLS-QUIC",
+          "naiveTcp": "Naive-TLS-TCP"
+        },
+        "toasts": {
+          "keyGenFailed": "Key generation failed: {error}",
+          "createdMany": "Created {count} listener(s)",
+          "createdMixed": "Created {ok}, failed {failed}"
+        }
+      },
+      "detail": {
+        "empty": "Select an inbound to view details"
+      }
     },
     "clients": {
       "tabBasics": "Basics",

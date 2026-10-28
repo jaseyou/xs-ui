@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/eventbus"
+	"github.com/jaseyou/xs-ui/v3/internal/eventbus"
 )
 
 var cachedHostname string

@@ -1,0 +1,177 @@
+/* Top navigation bar — the new app shell replacing the left sidebar. */
+.ant-topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: var(--topbar-height, 56px);
+  padding: 0 16px;
+  background: var(--ant-color-bg-container);
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 0 0 auto;
+}
+
+.topbar-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  color: var(--ant-color-white, #fff);
+  background: linear-gradient(135deg, var(--ant-color-primary), color-mix(in srgb, var(--ant-color-primary) 70%, #000));
+}
+
+.topbar-brand-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ant-color-text);
+  letter-spacing: 0.2px;
+}
+
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.topbar-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.topbar-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  font: inherit;
+  font-size: 13.5px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ant-color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.topbar-nav-btn:hover {
+  color: var(--ant-color-text);
+  background: color-mix(in srgb, var(--ant-color-text) 6%, transparent);
+}
+
+.topbar-nav-btn.active {
+  color: var(--ant-color-white, #fff);
+  background: var(--ant-color-primary);
+}
+
+.topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.topbar-search {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ant-color-text-secondary);
+  background: var(--ant-color-fill-tertiary);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 9px;
+  padding: 5px 10px;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.topbar-search-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topbar-search-kbd {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.topbar-search-kbd span {
+  font-size: 11px;
+  line-height: 1;
+  padding: 3px 4px;
+  border-radius: 4px;
+  border: 1px solid var(--ant-color-border-secondary);
+  background: var(--ant-color-bg-container);
+  color: var(--ant-color-text-tertiary);
+}
+
+.topbar-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: 15px;
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 9px;
+  background: var(--ant-color-bg-container);
+  color: var(--ant-color-text-secondary);
+  cursor: pointer;
+}
+
+.topbar-icon-btn:hover {
+  color: var(--ant-color-primary);
+  border-color: var(--ant-color-primary);
+}
+
+.topbar-version {
+  font-size: 12.5px;
+  color: var(--ant-color-text-tertiary);
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Content top padding: pages previously padded 24px under a sidebar; the
+   topbar needs its own breathing room below the sticky bar. */
+.ant-topbar + .ant-layout .content-area {
+  padding-top: 18px;
+}
+
+@media (max-width: 1100px) {
+  .topbar-nav {
+    display: none;
+  }
+  .topbar-search-text,
+  .topbar-search-kbd {
+    display: none;
+  }
+  .topbar-search {
+    padding: 5px 8px;
+  }
+}
+
+@media (max-width: 640px) {
+  .topbar-brand-text,
+  .topbar-version {
+    display: none;
+  }
+}

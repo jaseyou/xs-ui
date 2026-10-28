@@ -25,6 +25,7 @@ import {
   InfoCircleOutlined,
   DeleteOutlined,
   SearchOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
 
 import { HttpUtil } from '@/utils';
@@ -61,6 +62,9 @@ export default function InboundList({
   hasActiveNode,
   hosts,
   onAddInbound,
+  onGenerateListeners,
+  selectedId,
+  onRowClick,
   onGeneralAction,
   onRowAction,
   onBulkDelete,
@@ -230,6 +234,15 @@ export default function InboundList({
           >
             {!isMobile && t('pages.inbounds.addInbound')}
           </Button>
+          {onGenerateListeners && (
+            <Button
+              onClick={onGenerateListeners}
+              icon={<ThunderboltOutlined aria-hidden />}
+              aria-label={t('pages.inbounds.generate.title')}
+            >
+              {!isMobile && t('pages.inbounds.generate.title')}
+            </Button>
+          )}
           <Dropdown trigger={['click']} menu={generalActionsMenu}>
             <Button
               type="primary"
@@ -375,6 +388,10 @@ export default function InboundList({
               selectedRowKeys,
               onChange: (keys: Key[]) => setSelectedRowKeys(keys as number[]),
             }}
+            onRow={(record) => ({
+              onClick: () => onRowClick?.(record.id),
+            })}
+            rowClassName={(record) => (selectedId === record.id ? 'inbound-row-selected' : '')}
             pagination={paginationFor(visibleInbounds)}
             scroll={{ x: tableScrollX }}
             style={{ marginTop: 10 }}

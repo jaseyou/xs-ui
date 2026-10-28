@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
 )
 
 func banLineCount(t *testing.T, email string) int {

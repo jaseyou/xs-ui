@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawg"
+	"github.com/jaseyou/xs-ui/v3/internal/amneziawg"
 )
 
 // installCommand is what an admin runs to satisfy every host-level blocker at once.

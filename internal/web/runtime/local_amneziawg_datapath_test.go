@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawgnet"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/wireguard"
+	"github.com/jaseyou/xs-ui/v3/internal/amneziawgnet"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/util/wireguard"
 )
 
 // datapathInbound builds a minimal AmneziaWG inbound, kernel mode on or off.

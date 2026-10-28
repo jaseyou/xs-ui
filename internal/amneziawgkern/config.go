@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawg"
-	"github.com/mhsanaei/3x-ui/v3/internal/config"
+	"github.com/jaseyou/xs-ui/v3/internal/amneziawg"
+	"github.com/jaseyou/xs-ui/v3/internal/config"
 )
 
 // interfacePrefix keeps panel interfaces out of the awg0/awg1 names operators

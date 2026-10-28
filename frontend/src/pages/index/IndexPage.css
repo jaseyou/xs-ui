@@ -485,3 +485,13 @@
 .index-page .ip-hidden {
   filter: blur(6px);
 }
+
+/* 布局重设计:资源瓦片紧凑化,贴近顶部指标条形态 */
+.ov-vitals .ov-vital {
+  padding: 10px 14px;
+}
+@media (min-width: 1100px) {
+  .ov-vitals {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

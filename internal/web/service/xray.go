@@ -11,15 +11,16 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawg"
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawgnet"
-	"github.com/mhsanaei/3x-ui/v3/internal/config"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/tuic"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/json_util"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/maskcompat"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/jaseyou/xs-ui/v3/internal/amneziawg"
+	"github.com/jaseyou/xs-ui/v3/internal/amneziawgnet"
+	"github.com/jaseyou/xs-ui/v3/internal/config"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/logger"
+	"github.com/jaseyou/xs-ui/v3/internal/singbox"
+	"github.com/jaseyou/xs-ui/v3/internal/tuic"
+	"github.com/jaseyou/xs-ui/v3/internal/util/json_util"
+	"github.com/jaseyou/xs-ui/v3/internal/util/maskcompat"
+	"github.com/jaseyou/xs-ui/v3/internal/xray"
 
 	"go.uber.org/atomic"
 )
@@ -211,11 +212,16 @@ func (s *XrayService) GetXrayConfig() (*xray.Config, error) {
 		if inbound.NodeID != nil {
 			continue
 		}
-		if inbound.Protocol == model.MTProto || inbound.Protocol == model.AmneziaWG || inbound.Protocol == model.TUIC {
+		if inbound.Protocol == model.MTProto || inbound.Protocol == model.AmneziaWG || inbound.Protocol == model.TUIC || inbound.Protocol.IsSingboxProtocol() {
 			continue
 		}
 		settings := map[string]any{}
 		_ = json.Unmarshal([]byte(inbound.Settings), &settings)
+		// A hysteria row marked core=singbox is served by the sidecar (salamander
+		// obfs etc. that xray's hysteria cannot express), not by this config.
+		if inbound.Protocol == model.Hysteria && settings["core"] == "singbox" {
+			continue
+		}
 		flowAllowed := !inbound.DisableFlow &&
 			inboundCanEnableTlsFlow(string(inbound.Protocol), inbound.StreamSettings, inbound.Settings)
 		var wireguardClientsByEmail map[string]model.Client
@@ -1482,6 +1488,12 @@ func (s *XrayService) RestartXray(isForce bool) error {
 	lock.Lock()
 	defer lock.Unlock()
 	logger.Debug("restart Xray, force:", isForce)
+	// The sing-box sidecar hosts the protocols Xray cannot (anytls, shadowtls,
+	// naive and marked hysteria rows). It reconciles here — the funnel every
+	// inbound change passes through — and its failure must never fail Xray.
+	if err := singbox.Reconcile(s.inboundsForSingbox()); err != nil && !errors.Is(err, singbox.ErrBinaryMissing) {
+		logger.Warning("sing-box reconcile failed:", err)
+	}
 	if !isForce && isManuallyStopped.Load() {
 		return nil
 	}
@@ -1544,6 +1556,18 @@ func (s *XrayService) RestartXray(isForce bool) error {
 	}
 
 	return nil
+}
+
+// inboundsForSingbox loads the inbound list for the sing-box sidecar
+// reconciler. Errors are logged, not returned: a DB hiccup must not break the
+// Xray restart this runs inside of.
+func (s *XrayService) inboundsForSingbox() []*model.Inbound {
+	inbounds, err := s.inboundService.GetAllInbounds()
+	if err != nil {
+		logger.Warning("sing-box reconcile could not load inbounds:", err)
+		return nil
+	}
+	return inbounds
 }
 
 // restartToDropClients reports whether a diff that strands clients must be

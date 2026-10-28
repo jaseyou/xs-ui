@@ -10,7 +10,7 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
+	"github.com/jaseyou/xs-ui/v3/internal/logger"
 )
 
 func TestLoginCSRFRejectionLogsPeerIPNotForwardedHeader(t *testing.T) {

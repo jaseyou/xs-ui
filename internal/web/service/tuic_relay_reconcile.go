@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/jaseyou/xs-ui/v3/internal/xray"
 )
 
 // Renames and port swaps share one rollback boundary; independent inbounds do not.

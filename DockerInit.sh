@@ -64,6 +64,28 @@ tar -xzf "${MTG_PKG}.tar.gz"
 mv "${MTG_PKG}/mtg-multi" "${MTG_BIN}"
 rm -rf "${MTG_PKG}" "${MTG_PKG}.tar.gz"
 chmod +x "${MTG_BIN}"
+# sing-box sidecar (anytls / shadowtls / naive templates). Optional dependency:
+# skipped when upstream has no build for this platform; the panel runs without
+# it and only the singbox-hosted templates are unavailable.
+SINGBOX_VER=$(curl -sfL "https://api.github.com/repos/SagerNet/sing-box/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -n 1)
+if [ -n "$SINGBOX_VER" ]; then
+    SINGBOX_PKG="sing-box-${SINGBOX_VER#v}-linux-${PLATFORM}"
+    if curl -sfLRO "https://github.com/SagerNet/sing-box/releases/download/${SINGBOX_VER}/${SINGBOX_PKG}.tar.gz"; then
+        tar -xzf "${SINGBOX_PKG}.tar.gz"
+        case $PLATFORM in
+            armv7 | armv6) SINGBOX_BIN="sing-box-linux-arm32" ;;
+            *) SINGBOX_BIN="sing-box-linux-${PLATFORM}" ;;
+        esac
+        mv "${SINGBOX_PKG}/sing-box" "${SINGBOX_BIN}"
+        chmod +x "${SINGBOX_BIN}"
+        rm -rf "${SINGBOX_PKG}" "${SINGBOX_PKG}.tar.gz"
+    else
+        echo "DockerInit: no sing-box linux-${PLATFORM} build; sidecar templates will be unavailable" >&2
+        rm -f "${SINGBOX_PKG}.tar.gz"
+    fi
+else
+    echo "DockerInit: could not resolve the latest sing-box release tag; skipping sidecar" >&2
+fi
 curl -sfLRO https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
 curl -sfLRO https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
 curl -sfLRo geoip_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat

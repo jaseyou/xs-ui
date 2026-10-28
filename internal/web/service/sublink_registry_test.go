@@ -4,7 +4,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
 )
 
 type fakeSubLinkProvider struct {

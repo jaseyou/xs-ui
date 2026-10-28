@@ -7,3 +7,21 @@
   color: var(--ant-color-text-tertiary);
   font-size: 12px;
 }
+
+/* 左侧分组导航(布局重设计) */
+.settings-nav-card .ant-card-body {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.settings-nav-card .ant-menu {
+  border-inline-end: none;
+  background: transparent;
+}
+.settings-nav-actions {
+  display: grid;
+  gap: 8px;
+  padding: 8px 4px 4px;
+  border-top: 1px solid var(--ant-color-border-secondary);
+}

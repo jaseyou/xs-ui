@@ -12,8 +12,8 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/util/json_util"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/jaseyou/xs-ui/v3/internal/util/json_util"
+	"github.com/jaseyou/xs-ui/v3/internal/xray"
 )
 
 // Protocol represents the protocol type for Xray inbounds.
@@ -38,7 +38,24 @@ const (
 	AmneziaWG   Protocol = "amneziawg"
 	TUIC        Protocol = "tuic"
 	MASQUE      Protocol = "masque"
+
+	// Anytls, Shadowtls and Naive inbounds are served by the sing-box sidecar
+	// core, not by Xray: Xray has no implementation for these protocols.
+	Anytls    Protocol = "anytls"
+	Shadowtls Protocol = "shadowtls"
+	Naive     Protocol = "naive"
 )
+
+// SingboxProtocols lists the inbound protocols rendered into the sing-box
+// sidecar configuration instead of the Xray configuration.
+func SingboxProtocols() map[Protocol]bool {
+	return map[Protocol]bool{Anytls: true, Shadowtls: true, Naive: true}
+}
+
+// IsSingboxProtocol reports whether the protocol is served by the sing-box sidecar.
+func (p Protocol) IsSingboxProtocol() bool {
+	return p == Anytls || p == Shadowtls || p == Naive
+}
 
 // User represents a user account in the 3x-ui panel.
 type User struct {
@@ -68,7 +85,7 @@ type Inbound struct {
 	// Xray configuration fields
 	Listen            string   `json:"listen" form:"listen"`
 	Port              int      `json:"port" form:"port" validate:"gte=0,lte=65535" example:"443"`
-	Protocol          Protocol `json:"protocol" form:"protocol" validate:"required,oneof=vmess vless trojan shadowsocks wireguard hysteria http mixed tunnel tun mtproto amneziawg tuic masque" example:"vless"`
+	Protocol          Protocol `json:"protocol" form:"protocol" validate:"required,oneof=vmess vless trojan shadowsocks wireguard hysteria http mixed tunnel tun mtproto amneziawg tuic masque anytls shadowtls naive" example:"vless"`
 	Settings          string   `json:"settings" form:"settings"`
 	StreamSettings    string   `json:"streamSettings" form:"streamSettings"`
 	Tag               string   `json:"tag" form:"tag" gorm:"unique" example:"in-443-tcp"`

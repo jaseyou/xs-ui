@@ -11,6 +11,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
 import type { AllSetting } from '@/models/setting';
+import { BRAND_DOCS_URL } from '@/lib/branding';
 import type { SubProfileMode, SubHostSortMode } from '@/schemas/setting';
 import { onNumber } from '@/utils/onNumber';
 import { DefaultSettingTag, SettingListItem } from '@/components/ui';
@@ -382,13 +383,11 @@ export default function SubscriptionGeneralTab({
                 description={
                   <>
                     {t('pages.settings.subThemeDirDesc')}{' '}
-                    <a
-                      href="https://github.com/MHSanaei/3x-ui/blob/main/docs/custom-subscription-templates.md"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {t('pages.settings.subThemeDirDocs')}
-                    </a>
+                    {BRAND_DOCS_URL ? (
+                      <a href={BRAND_DOCS_URL} target="_blank" rel="noopener noreferrer">
+                        {t('pages.settings.subThemeDirDocs')}
+                      </a>
+                    ) : null}
                   </>
                 }
               >

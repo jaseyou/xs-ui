@@ -18,17 +18,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/goccy/go-json"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawg"
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/tuic"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/common"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/maskcompat"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/random"
-	wgutil "github.com/mhsanaei/3x-ui/v3/internal/util/wireguard"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/jaseyou/xs-ui/v3/internal/amneziawg"
+	"github.com/jaseyou/xs-ui/v3/internal/database"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/logger"
+	"github.com/jaseyou/xs-ui/v3/internal/tuic"
+	"github.com/jaseyou/xs-ui/v3/internal/util/common"
+	"github.com/jaseyou/xs-ui/v3/internal/util/maskcompat"
+	"github.com/jaseyou/xs-ui/v3/internal/util/random"
+	wgutil "github.com/jaseyou/xs-ui/v3/internal/util/wireguard"
+	"github.com/jaseyou/xs-ui/v3/internal/web/service"
+	"github.com/jaseyou/xs-ui/v3/internal/xray"
 )
 
 var salamanderWarningSeen sync.Map
@@ -939,8 +939,152 @@ func (s *SubService) GetLink(inbound *model.Inbound, email string) string {
 		return s.genAmneziaWGLink(inbound, email)
 	case "tuic":
 		return s.genTuicLink(inbound, email)
+	case "anytls":
+		return s.genAnytlsLink(inbound, email)
+	case "naive":
+		return s.genNaiveLink(inbound, email)
+	case "shadowtls":
+		return s.genShadowtlsLink(inbound, email)
 	}
 	return ""
+}
+
+// singboxClientFor finds the template client a link is being built for:
+// sing-box-hosted rows keep the panel's clients array shape with the secret
+// in "password" (hysteria rows may use "auth").
+func singboxClientFor(inbound *model.Inbound, email string) (password, auth string, ok bool) {
+	settings := map[string]any{}
+	if err := json.Unmarshal([]byte(inbound.Settings), &settings); err != nil {
+		return "", "", false
+	}
+	clients, _ := settings["clients"].([]any)
+	var first, matched map[string]any
+	for _, c := range clients {
+		client, ok := c.(map[string]any)
+		if !ok {
+			continue
+		}
+		if first == nil {
+			first = client
+		}
+		if e, _ := client["email"].(string); e == email {
+			matched = client
+			break
+		}
+	}
+	client := matched
+	if client == nil && email == "" {
+		client = first
+	}
+	if client == nil {
+		return "", "", false
+	}
+	password, _ = client["password"].(string)
+	auth, _ = client["auth"].(string)
+	return password, auth, true
+}
+
+// genAnytlsLink builds anytls://<password>@host:port with TLS or REALITY
+// parameters, mirroring the NekoBox anytls share format.
+func (s *SubService) genAnytlsLink(inbound *model.Inbound, email string) string {
+	password, _, ok := singboxClientFor(inbound, email)
+	if !ok || password == "" {
+		return ""
+	}
+	params := make(map[string]string)
+	stream := unmarshalStreamSettings(inbound.StreamSettings)
+	switch stream["security"] {
+	case "reality":
+		rs, _ := stream["realitySettings"].(map[string]any)
+		inner, _ := rs["settings"].(map[string]any)
+		if pk, _ := inner["publicKey"].(string); pk != "" {
+			params["pbk"] = pk
+		}
+		if shortIds, _ := rs["shortIds"].([]any); len(shortIds) > 0 {
+			if sid, _ := shortIds[0].(string); sid != "" {
+				params["sid"] = sid
+			}
+		}
+		if fp, _ := inner["fingerprint"].(string); fp != "" {
+			params["fp"] = fp
+		}
+		if names, _ := rs["serverNames"].([]any); len(names) > 0 {
+			if sni, _ := names[0].(string); sni != "" {
+				params["sni"] = sni
+			}
+		}
+	case "tls":
+		tlsSettings, _ := stream["tlsSettings"].(map[string]any)
+		if sni, _ := tlsSettings["serverName"].(string); sni != "" {
+			params["sni"] = sni
+		}
+		params["insecure"] = "0"
+	}
+	host := s.resolveInboundAddress(inbound)
+	link := fmt.Sprintf("anytls://%s@%s", encodeUserinfo(password), joinHostPort(host, inbound.Port))
+	return buildLinkWithParams(link, params, s.genRemark(inbound, email, "", ""))
+}
+
+// genNaiveLink builds naive+https:// (h2) or naive+quic:// (h3) links; the
+// ALPN on the inbound's TLS block picks the scheme.
+func (s *SubService) genNaiveLink(inbound *model.Inbound, email string) string {
+	password, _, ok := singboxClientFor(inbound, email)
+	if !ok || password == "" {
+		return ""
+	}
+	scheme := "naive+https"
+	stream := unmarshalStreamSettings(inbound.StreamSettings)
+	if tlsSettings, _ := stream["tlsSettings"].(map[string]any); tlsSettings != nil {
+		if alpn, _ := tlsSettings["alpn"].([]any); len(alpn) > 0 {
+			if a, _ := alpn[0].(string); a == "h3" {
+				scheme = "naive+quic"
+			}
+		}
+	}
+	host := s.resolveInboundAddress(inbound)
+	// naive authenticates with HTTP basic auth: username is the client email.
+	return fmt.Sprintf("%s://%s:%s@%s", scheme, encodeUserinfo(email), encodeUserinfo(password), joinHostPort(host, inbound.Port))
+}
+
+// genShadowtlsLink builds an ss:// link carrying the ShadowTLS SIP003-style
+// plugin parameters; the SS2022 method:password is the userinfo, the
+// ShadowTLS password rides in the plugin options.
+func (s *SubService) genShadowtlsLink(inbound *model.Inbound, email string) string {
+	settings := map[string]any{}
+	if err := json.Unmarshal([]byte(inbound.Settings), &settings); err != nil {
+		return ""
+	}
+	password, _, ok := singboxClientFor(inbound, email)
+	if !ok || password == "" {
+		return ""
+	}
+	ssMethod, _ := settings["ssMethod"].(string)
+	ssPassword, _ := settings["ssPassword"].(string)
+	if ssMethod == "" || ssPassword == "" {
+		return ""
+	}
+	sni := ""
+	stream := unmarshalStreamSettings(inbound.StreamSettings)
+	switch stream["security"] {
+	case "reality":
+		if names, _ := stream["realitySettings"].(map[string]any)["serverNames"].([]any); len(names) > 0 {
+			sni, _ = names[0].(string)
+		}
+	case "tls":
+		sni, _ = stream["tlsSettings"].(map[string]any)["serverName"].(string)
+	}
+	version := 3
+	if v, okV := settings["version"].(float64); okV && int(v) > 0 {
+		version = int(v)
+	}
+	plugin := fmt.Sprintf("shadowtls;version=%d;password=%s", version, encodeUserinfo(password))
+	if sni != "" {
+		plugin += ";sni=" + sni
+	}
+	userinfo := base64.RawURLEncoding.EncodeToString([]byte(ssMethod + ":" + ssPassword))
+	host := s.resolveInboundAddress(inbound)
+	link := fmt.Sprintf("ss://%s@%s", userinfo, joinHostPort(host, inbound.Port))
+	return buildLinkWithParams(link, map[string]string{"plugin": plugin}, s.genRemark(inbound, email, "", ""))
 }
 
 func (s *SubService) genTuicLink(inbound *model.Inbound, email string) string {

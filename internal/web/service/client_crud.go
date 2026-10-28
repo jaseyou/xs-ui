@@ -16,13 +16,13 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/tuic"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/common"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/random"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/jaseyou/xs-ui/v3/internal/database"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/logger"
+	"github.com/jaseyou/xs-ui/v3/internal/tuic"
+	"github.com/jaseyou/xs-ui/v3/internal/util/common"
+	"github.com/jaseyou/xs-ui/v3/internal/util/random"
+	"github.com/jaseyou/xs-ui/v3/internal/xray"
 
 	"gorm.io/gorm"
 )
@@ -456,7 +456,7 @@ func (s *ClientService) fillProtocolDefaultsAgainstExisting(c *model.Client, ib 
 		if c.ID == "" {
 			c.ID = uuid.NewString()
 		}
-	case model.Trojan, model.MASQUE:
+	case model.Trojan, model.MASQUE, model.Anytls, model.Shadowtls, model.Naive:
 		if c.Password == "" {
 			c.Password = strings.ReplaceAll(uuid.NewString(), "-", "")
 		}

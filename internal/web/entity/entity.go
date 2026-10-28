@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/util/common"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/cronspec"
+	"github.com/jaseyou/xs-ui/v3/internal/util/common"
+	"github.com/jaseyou/xs-ui/v3/internal/util/cronspec"
 )
 
 type Msg struct {

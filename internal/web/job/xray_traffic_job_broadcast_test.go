@@ -4,7 +4,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/jaseyou/xs-ui/v3/internal/xray"
 )
 
 func TestSplitMovedClientTraffics(t *testing.T) {

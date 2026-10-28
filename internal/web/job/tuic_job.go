@@ -5,11 +5,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/tuic"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/websocket"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/jaseyou/xs-ui/v3/internal/logger"
+	"github.com/jaseyou/xs-ui/v3/internal/tuic"
+	"github.com/jaseyou/xs-ui/v3/internal/web/service"
+	"github.com/jaseyou/xs-ui/v3/internal/web/websocket"
+	"github.com/jaseyou/xs-ui/v3/internal/xray"
 )
 
 const defaultTuicSpeedSampleInterval = 10 * time.Second

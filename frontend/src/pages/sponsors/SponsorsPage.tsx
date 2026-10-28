@@ -4,7 +4,7 @@ import { Button, Col, ConfigProvider, Layout, Row, Spin, Typography } from 'antd
 import { CrownOutlined, PlusOutlined } from '@ant-design/icons';
 
 import { useTheme } from '@/hooks/useTheme';
-import AppSidebar from '@/layouts/AppSidebar';
+import AppTopbar from '@/layouts/AppTopbar';
 import { useSponsorsQuery } from '@/api/queries/useSponsorsQuery';
 import SponsorCard from '@/components/sponsor/SponsorCard';
 import { sponsorsForSlot } from '@/lib/sponsors';
@@ -57,7 +57,7 @@ export default function SponsorsPage() {
   return (
     <ConfigProvider theme={antdThemeConfig}>
       <Layout className={pageClass}>
-        <AppSidebar />
+        <AppTopbar />
         <Layout className="content-shell">
           <Layout.Content className="content-area">
             <div className="sponsors-inner">

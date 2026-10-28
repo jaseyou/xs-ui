@@ -16,18 +16,18 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/amneziawg"
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/mtproto"
-	"github.com/mhsanaei/3x-ui/v3/internal/tuic"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/common"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/maskcompat"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/netsafe"
-	wgutil "github.com/mhsanaei/3x-ui/v3/internal/util/wireguard"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/runtime"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/jaseyou/xs-ui/v3/internal/amneziawg"
+	"github.com/jaseyou/xs-ui/v3/internal/database"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/logger"
+	"github.com/jaseyou/xs-ui/v3/internal/mtproto"
+	"github.com/jaseyou/xs-ui/v3/internal/tuic"
+	"github.com/jaseyou/xs-ui/v3/internal/util/common"
+	"github.com/jaseyou/xs-ui/v3/internal/util/maskcompat"
+	"github.com/jaseyou/xs-ui/v3/internal/util/netsafe"
+	wgutil "github.com/jaseyou/xs-ui/v3/internal/util/wireguard"
+	"github.com/jaseyou/xs-ui/v3/internal/web/runtime"
+	"github.com/jaseyou/xs-ui/v3/internal/xray"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -658,6 +658,11 @@ func (s *InboundService) normalizeStreamSettings(inbound *model.Inbound) {
 		model.WireGuard:   true,
 		model.Tunnel:      true,
 		model.MASQUE:      true,
+		// The sing-box sidecar reads its TLS/REALITY blocks from
+		// streamSettings too, so those rows keep theirs.
+		model.Anytls:    true,
+		model.Shadowtls: true,
+		model.Naive:     true,
 	}
 
 	if !protocolsWithStream[inbound.Protocol] {

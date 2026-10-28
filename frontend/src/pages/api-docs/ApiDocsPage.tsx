@@ -5,7 +5,8 @@ import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 
 import { useTheme } from '@/hooks/useTheme';
-import AppSidebar from '@/layouts/AppSidebar';
+import { BRAND_NAME } from '@/lib/branding';
+import AppTopbar from '@/layouts/AppTopbar';
 import { EXAMPLES } from '@/generated/examples';
 import { buildWebSocketEvents } from './websocket-events';
 import './ApiDocsPage.css';
@@ -83,7 +84,7 @@ export default function ApiDocsPage() {
   return (
     <ConfigProvider theme={antdThemeConfig}>
       <Layout className={pageClass}>
-        <AppSidebar />
+        <AppTopbar />
 
         <Layout className="content-shell">
           <Layout.Content className="content-area">
@@ -91,7 +92,7 @@ export default function ApiDocsPage() {
               items={[
                 {
                   key: 'panel-api',
-                  label: '3X-UI Panel API',
+                  label: `${BRAND_NAME} Panel API`,
                   children: (
                     <div className="docs-wrapper" role="region" aria-label={t('menu.apiDocs')}>
                       <SwaggerUI

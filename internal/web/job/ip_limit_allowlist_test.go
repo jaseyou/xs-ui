@@ -3,7 +3,7 @@ package job
 import (
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/jaseyou/xs-ui/v3/internal/database/model"
 )
 
 // Addresses in the examples below come from the documentation ranges reserved

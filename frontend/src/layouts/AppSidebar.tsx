@@ -31,18 +31,25 @@ import {
 
 import { HttpUtil } from '@/utils';
 import { formatPanelVersion } from '@/lib/panel-version';
+import {
+  BRAND_NAME,
+  BRAND_SHORT_NAME,
+  BRAND_DOCS_URL,
+  BRAND_DONATE_URL,
+  BRAND_REPO_URL,
+} from '@/lib/branding';
 import { pauseAnimationsUntilLeave, useTheme } from '@/hooks/useTheme';
 import { useAllSettings } from '@/api/queries/useAllSettings';
 import { useCommandPalette } from '@/components/command-palette/useCommandPalette';
 import { PANEL_ROUTES } from '@/routes/panelRoutes';
 import './AppSidebar.css';
 
-const DONATE_URL = 'https://donate.sanaei.dev/';
+const DONATE_URL = BRAND_DONATE_URL;
 // The palette listens for Ctrl as well as Cmd, so the chip must not show a
 // Mac glyph to the Linux and Windows operators who are most of this panel's.
 const SHORTCUT_MODIFIER = /Mac|iPhone|iPad|iPod/.test(navigator.userAgent) ? '⌘' : 'Ctrl';
-const DOCS_URL = 'https://docs.sanaei.dev/';
-const REPO_URL = 'https://github.com/MHSanaei/3x-ui';
+const DOCS_URL = BRAND_DOCS_URL;
+const REPO_URL = BRAND_REPO_URL;
 const LOGOUT_KEY = '__logout__';
 const RAIL_WIDTH = 72;
 const SIDER_WIDTH = 220;
@@ -51,6 +58,7 @@ const SIDEBAR_PINNED_KEY = 'sidebar-pinned';
 let hoveredAcrossRemounts = false;
 
 function DonateButton({ ariaLabel }: { ariaLabel: string }) {
+  if (!DONATE_URL) return null;
   return (
     <a
       href={DONATE_URL}
@@ -66,6 +74,7 @@ function DonateButton({ ariaLabel }: { ariaLabel: string }) {
 }
 
 function DocsButton({ ariaLabel }: { ariaLabel: string }) {
+  if (!DOCS_URL) return null;
   return (
     <a
       href={DOCS_URL}
@@ -83,6 +92,13 @@ function DocsButton({ ariaLabel }: { ariaLabel: string }) {
 function VersionBadge({ version, collapsed }: { version: string; collapsed?: boolean }) {
   if (!version) return null;
   const label = formatPanelVersion(version);
+  if (!REPO_URL) {
+    return (
+      <span className="sider-version" title={label}>
+        {!collapsed && <span className="sider-version-text">{label}</span>}
+      </span>
+    );
+  }
   return (
     <a
       href={REPO_URL}
@@ -367,7 +383,7 @@ export default function AppSidebar() {
       >
         <div className="sider-brand">
           <div className="brand-block">
-            <span className="brand-text">{railCollapsed ? '3X' : '3X-UI'}</span>
+            <span className="brand-text">{railCollapsed ? BRAND_SHORT_NAME : BRAND_NAME}</span>
           </div>
           {!railCollapsed && (
             <div className="brand-actions">
@@ -455,7 +471,7 @@ export default function AppSidebar() {
       >
         <div className="drawer-header">
           <div className="brand-block">
-            <span className="drawer-brand">3X-UI</span>
+            <span className="drawer-brand">{BRAND_NAME}</span>
           </div>
           <div className="drawer-header-actions">
             <DocsButton ariaLabel={t('menu.docs') || 'Documentation'} />

@@ -15,6 +15,9 @@ export const ProtocolSchema = z.enum([
   'amneziawg',
   'tuic',
   'masque',
+  'anytls',
+  'shadowtls',
+  'naive',
 ]);
 export type Protocol = z.infer<typeof ProtocolSchema>;
 
@@ -24,6 +27,8 @@ export type Protocol = z.infer<typeof ProtocolSchema>;
 // mutate the dispatch table. TUN is kept here for parity even though the
 // Go backend's validator no longer accepts it — existing panel deployments
 // may still have TUN inbounds saved that we want to render.
+// anytls/shadowtls/naive are served by the sing-box sidecar core; their
+// settings are edited as raw JSON in v1.
 export const Protocols = Object.freeze({
   VMESS: 'vmess',
   VLESS: 'vless',
@@ -39,4 +44,7 @@ export const Protocols = Object.freeze({
   AMNEZIAWG: 'amneziawg',
   TUIC: 'tuic',
   MASQUE: 'masque',
+  ANYTLS: 'anytls',
+  SHADOWTLS: 'shadowtls',
+  NAIVE: 'naive',
 });
