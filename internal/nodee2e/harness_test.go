@@ -66,6 +66,9 @@ func (p *panel) env() []string {
 		"XUI_BIN_FOLDER="+filepath.Join(p.dir, "bin"),
 		"XUI_ENABLE_FAIL2BAN=false",
 		"MSYS_NO_PATHCONV=1",
+		// The harness drives `setting` while the panel is already running and
+		// restarts it itself; the CLI's SIGHUP auto-reload would race that.
+		"XUI_CLI_NO_RELOAD=1",
 	)
 }
 
