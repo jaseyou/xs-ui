@@ -974,7 +974,7 @@ prompt_and_setup_ssl() {
                 if [[ -n "$ip_confirm" && "$ip_confirm" != "y" && "$ip_confirm" != "Y" ]]; then
                     server_ip=""
                     while [[ -z "$server_ip" ]]; do
-                        read -rp "Please enter your server's public IPv4 address: " server_ip
+                        read -rp "请输入服务器公网 IPv4 地址: " server_ip
                         server_ip="${server_ip// /}"
                         if [[ ! "$server_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
                             echo -e "${red}Invalid IPv4 address. Please try again.${plain}"
@@ -1162,7 +1162,7 @@ config_after_install() {
         else
             echo -e "${yellow}Could not auto-detect server IP from any provider.${plain}"
             while [[ -z "$server_ip" ]]; do
-                read -rp "Please enter your server's public IPv4 address: " server_ip
+                read -rp "请输入服务器公网 IPv4 地址: " server_ip
                 server_ip="${server_ip// /}"
                 if [[ ! "$server_ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
                     echo -e "${red}Invalid IPv4 address. Please try again.${plain}"
@@ -1310,19 +1310,19 @@ EOF
             if [[ "$NONINTERACTIVE" == "1" ]]; then
                 if [[ -n "${XUI_PANEL_PORT:-}" ]]; then
                     config_port="${XUI_PANEL_PORT}"
-                    echo -e "${yellow}Your Panel Port is: ${config_port}${plain}"
+                    echo -e "${yellow}当前面板端口: ${config_port}${plain}"
                 else
                     config_port=$(shuf -i 1024-62000 -n 1)
-                    echo -e "${yellow}Generated random port: ${config_port}${plain}"
+                    echo -e "${yellow}已生成随机端口: ${config_port}${plain}"
                 fi
             else
-                read -rp "Would you like to customize the Panel Port settings? (If not, a random port will be applied) [y/n]: " config_confirm
+                read -rp "是否自定义面板端口?(不自定义将使用随机端口)[y/n]: " config_confirm
                 if [[ "${config_confirm}" == "y" || "${config_confirm}" == "Y" ]]; then
-                    read -rp "Please set up the panel port: " config_port
-                    echo -e "${yellow}Your Panel Port is: ${config_port}${plain}"
+                    read -rp "请设置面板端口: " config_port
+                    echo -e "${yellow}当前面板端口: ${config_port}${plain}"
                 else
                     config_port=$(shuf -i 1024-62000 -n 1)
-                    echo -e "${yellow}Generated random port: ${config_port}${plain}"
+                    echo -e "${yellow}已生成随机端口: ${config_port}${plain}"
                 fi
             fi
 
@@ -1330,11 +1330,11 @@ EOF
 
             echo ""
             echo -e "${green}═══════════════════════════════════════════${plain}"
-            echo -e "${green}     SSL Certificate Setup (RECOMMENDED)   ${plain}"
+            echo -e "${green}     SSL 证书配置(推荐)              ${plain}"
             echo -e "${green}═══════════════════════════════════════════${plain}"
-            echo -e "${yellow}SSL is strongly recommended. Skip only if a reverse proxy${plain}"
-            echo -e "${yellow}or SSH tunnel handles TLS for you.${plain}"
-            echo -e "${yellow}Let's Encrypt now supports both domains and IP addresses!${plain}"
+            echo -e "${yellow}强烈建议配置 SSL。如已由反向代理或 SSH 隧道处理 TLS,${plain}"
+            echo -e "${yellow}才可跳过。${plain}"
+            echo -e "${yellow}Let's Encrypt 现已同时支持域名和 IP 地址!${plain}"
             echo ""
 
             prompt_and_setup_ssl "${config_port}" "${config_webBasePath}" "${server_ip}"
@@ -1345,12 +1345,12 @@ EOF
             # Display final credentials and access information
             echo ""
             echo -e "${green}═══════════════════════════════════════════${plain}"
-            echo -e "${green}     Panel Installation Complete!         ${plain}"
+            echo -e "${green}     面板安装完成!                       ${plain}"
             echo -e "${green}═══════════════════════════════════════════${plain}"
-            echo -e "${green}Username:    ${config_username}${plain}"
-            echo -e "${green}Password:    ${config_password}${plain}"
-            echo -e "${green}Port:        ${config_port}${plain}"
-            echo -e "${green}WebBasePath: ${config_webBasePath}${plain}"
+            echo -e "${green}用户名:     ${config_username}${plain}"
+            echo -e "${green}密码:       ${config_password}${plain}"
+            echo -e "${green}端口:       ${config_port}${plain}"
+            echo -e "${green}访问路径:   ${config_webBasePath}${plain}"
             echo -e "${green}Database:    ${db_label}${plain}"
             echo -e "${green}Access URL:  ${SSL_SCHEME}://${SSL_HOST}:${config_port}/${config_webBasePath}${plain}"
             echo -e "${green}API Token:   ${config_apiToken}${plain}"
@@ -1408,9 +1408,9 @@ EOF
             if [[ -z "${existing_cert}" ]]; then
                 echo ""
                 echo -e "${green}═══════════════════════════════════════════${plain}"
-                echo -e "${green}     SSL Certificate Setup (RECOMMENDED)   ${plain}"
+                echo -e "${green}     SSL 证书配置(推荐)              ${plain}"
                 echo -e "${green}═══════════════════════════════════════════${plain}"
-                echo -e "${yellow}Let's Encrypt now supports both domains and IP addresses!${plain}"
+                echo -e "${yellow}Let's Encrypt 现已同时支持域名和 IP 地址!${plain}"
                 echo ""
                 prompt_and_setup_ssl "${existing_port}" "${config_webBasePath}" "${server_ip}"
                 echo -e "${green}Access URL:  ${SSL_SCHEME}://${SSL_HOST}:${existing_port}/${config_webBasePath}${plain}"
@@ -1449,9 +1449,9 @@ EOF
         if [[ -z "$existing_cert" ]]; then
             echo ""
             echo -e "${green}═══════════════════════════════════════════${plain}"
-            echo -e "${green}     SSL Certificate Setup (RECOMMENDED)   ${plain}"
+            echo -e "${green}     SSL 证书配置(推荐)              ${plain}"
             echo -e "${green}═══════════════════════════════════════════${plain}"
-            echo -e "${yellow}Let's Encrypt now supports both domains and IP addresses!${plain}"
+            echo -e "${yellow}Let's Encrypt 现已同时支持域名和 IP 地址!${plain}"
             echo ""
             prompt_and_setup_ssl "${existing_port}" "${existing_webBasePath}" "${server_ip}"
             echo -e "${green}Access URL:  ${SSL_SCHEME}://${SSL_HOST}:${existing_port}/${existing_webBasePath}${plain}"
