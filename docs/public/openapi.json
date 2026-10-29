@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "XS-UI Panel API",
+    "title": "3X-UI Panel API",
     "version": "3.x",
-    "description": "Programmatic interface to a XS-UI panel. Authenticate either by logging in (cookie) or with a scoped API token from Settings → Security → API Token (Bearer). Token access is limited by its admin, monitor, node-sync, or node-admin scope; treat admin tokens like the panel password."
+    "description": "Programmatic interface to a 3X-UI panel. Authenticate either by logging in (cookie) or with a scoped API token from Settings → Security → API Token (Bearer). Token access is limited by its admin, monitor, node-sync, or node-admin scope; treat admin tokens like the panel password."
   },
   "servers": [
     {
@@ -21,7 +21,7 @@
       "cookieAuth": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "xs-ui",
+        "name": "3x-ui",
         "description": "Session cookie set by POST /login. Browser-only."
       }
     },
@@ -3230,7 +3230,10 @@
               "mtproto",
               "amneziawg",
               "tuic",
-              "masque"
+              "masque",
+              "anytls",
+              "shadowtls",
+              "naive"
             ],
             "example": "vless",
             "type": "string"
@@ -4664,7 +4667,7 @@
         "type": "object"
       },
       "Sponsor": {
-        "description": "Sponsor is one paid placement published in the repo's sponsors.json.",
+        "description": "Sponsor is one paid placement published by the configured sponsor source.",
         "properties": {
           "enable": {
             "example": true,
@@ -5036,7 +5039,7 @@
     },
     {
       "name": "Nodes",
-      "description": "Manage remote xs-ui panels acting as nodes for a central panel. All endpoints under /panel/api/nodes."
+      "description": "Manage remote panels acting as nodes for a central panel. All endpoints under /panel/api/nodes."
     },
     {
       "name": "Hosts",
@@ -6845,7 +6848,7 @@
         "tags": [
           "Server"
         ],
-        "summary": "Check whether a newer xs-ui release is available on GitHub.",
+        "summary": "Check whether a newer panel release is available on GitHub.",
         "operationId": "get_panel_api_server_getPanelUpdateInfo",
         "responses": {
           "200": {
@@ -13472,7 +13475,7 @@
         "tags": [
           "Settings"
         ],
-        "summary": "Restart the entire xs-ui process after a 3-second grace period. The connection drops immediately; the panel comes back online ~5-10 seconds later.",
+        "summary": "Restart the entire panel process after a 3-second grace period. The connection drops immediately; the panel comes back online ~5-10 seconds later.",
         "operationId": "post_panel_api_setting_restartPanel",
         "responses": {
           "200": {
@@ -15005,8 +15008,8 @@
                   },
                   "userAgent": {
                     "type": "string",
-                    "default": "xs-ui-outbound-sub/1.0",
-                    "description": "Custom User-Agent sent when fetching this subscription. Defaults to \"xs-ui-outbound-sub/1.0\"."
+                    "default": "MyPanel-outbound-sub/1.0",
+                    "description": "Custom User-Agent sent when fetching this subscription. Defaults to \"MyPanel-outbound-sub/1.0\"."
                   },
                   "updateInterval": {
                     "type": "integer",
@@ -15103,8 +15106,8 @@
                   },
                   "userAgent": {
                     "type": "string",
-                    "default": "xs-ui-outbound-sub/1.0",
-                    "description": "Custom User-Agent sent when fetching this subscription. Defaults to \"xs-ui-outbound-sub/1.0\"."
+                    "default": "MyPanel-outbound-sub/1.0",
+                    "description": "Custom User-Agent sent when fetching this subscription. Defaults to \"MyPanel-outbound-sub/1.0\"."
                   },
                   "updateInterval": {
                     "type": "integer",
