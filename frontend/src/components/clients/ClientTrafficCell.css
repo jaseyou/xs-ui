@@ -61,8 +61,8 @@
 }
 
 .client-traffic-cell.is-unlimited .client-traffic-cell-bar .ant-progress-inner .ant-progress-bg {
-  background-color: color-mix(in srgb, #722ed1 35%, transparent);
-  border: 1px solid color-mix(in srgb, #722ed1 55%, transparent);
+  background-color: color-mix(in srgb, #d97757 35%, transparent);
+  border: 1px solid color-mix(in srgb, #d97757 55%, transparent);
 }
 
 .client-traffic-cell-infinity {

@@ -18,7 +18,7 @@ export interface SparklineExtrema {
 }
 
 const DEFAULT_STROKE = '#008771';
-const DEFAULT_STROKE2 = '#722ed1';
+const DEFAULT_STROKE2 = '#d97757';
 const DEFAULT_STROKE3 = '#a0d911';
 const DEFAULT_MIN_COLOR = '#52c41a';
 const DEFAULT_MAX_COLOR = '#fa541c';

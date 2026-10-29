@@ -36,47 +36,48 @@ const initialDark = readBool(STORAGE_DARK, true);
 const initialUltra = readBool(STORAGE_ULTRA, false);
 applyDom(initialDark, initialUltra);
 
+// 暖黑棕底 + 暖灰容器,Claude 桌面端的深色质感
 const DARK_TOKENS = {
-  colorBgBase: '#1a1b1f',
-  colorBgLayout: '#1a1b1f',
-  colorBgContainer: '#23252b',
-  colorBgElevated: '#2d2f37',
+  colorBgBase: '#262624',
+  colorBgLayout: '#262624',
+  colorBgContainer: '#30302e',
+  colorBgElevated: '#3a3937',
   colorPrimary: BRAND_COLOR,
 };
 const ULTRA_DARK_TOKENS = {
-  colorBgBase: '#000',
-  colorBgLayout: '#000',
-  colorBgContainer: '#101013',
-  colorBgElevated: '#1a1a1e',
+  colorBgBase: '#141413',
+  colorBgLayout: '#141413',
+  colorBgContainer: '#1f1e1d',
+  colorBgElevated: '#2b2a28',
   colorPrimary: BRAND_COLOR,
 };
 const DARK_LAYOUT_TOKENS = {
-  bodyBg: '#1a1b1f',
-  headerBg: '#15161a',
+  bodyBg: '#262624',
+  headerBg: '#1f1e1d',
   headerColor: '#ffffff',
-  footerBg: '#1a1b1f',
-  siderBg: '#15161a',
-  triggerBg: '#23252b',
+  footerBg: '#262624',
+  siderBg: '#1f1e1d',
+  triggerBg: '#30302e',
   triggerColor: '#ffffff',
 };
 const ULTRA_DARK_LAYOUT_TOKENS = {
-  bodyBg: '#000',
-  headerBg: '#050507',
+  bodyBg: '#141413',
+  headerBg: '#0d0d0c',
   headerColor: '#ffffff',
-  footerBg: '#000',
-  siderBg: '#050507',
-  triggerBg: '#1a1a1e',
+  footerBg: '#141413',
+  siderBg: '#0d0d0c',
+  triggerBg: '#1f1e1d',
   triggerColor: '#ffffff',
 };
 const DARK_MENU_TOKENS = {
-  darkItemBg: '#15161a',
-  darkSubMenuItemBg: '#1a1b1f',
-  darkPopupBg: '#23252b',
+  darkItemBg: '#1f1e1d',
+  darkSubMenuItemBg: '#262624',
+  darkPopupBg: '#30302e',
 };
 const ULTRA_DARK_MENU_TOKENS = {
-  darkItemBg: '#050507',
-  darkSubMenuItemBg: '#000',
-  darkPopupBg: '#101013',
+  darkItemBg: '#0d0d0c',
+  darkSubMenuItemBg: '#141413',
+  darkPopupBg: '#1f1e1d',
 };
 const DARK_CARD_TOKENS = {
   colorBorderSecondary: 'rgba(255, 255, 255, 0.06)',
@@ -88,6 +89,13 @@ const STATISTIC_TOKENS = {
   contentFontSize: 17,
   titleFontSize: 11,
 };
+// 轻微暖化的浅色底:象牙纸面,而不是纯白
+const LIGHT_WARM_TOKENS = {
+  colorBgLayout: '#f7f5f0',
+  colorBgContainer: '#ffffff',
+  colorBorderSecondary: '#e8e4dc',
+};
+
 const LIGHT_CONTRAST_TOKENS = {
   colorTextDescription: 'rgba(0, 0, 0, 0.58)',
   colorTextTertiary: 'rgba(0, 0, 0, 0.58)',
@@ -121,7 +129,7 @@ export function buildAntdThemeConfig(isDark: boolean, isUltra: boolean): ThemeCo
     return {
       ...SHARED_STYLE_CONFIG,
       algorithm: antdTheme.defaultAlgorithm,
-      token: LIGHT_CONTRAST_TOKENS,
+      token: { ...LIGHT_WARM_TOKENS, ...LIGHT_CONTRAST_TOKENS },
       components: {
         Statistic: STATISTIC_TOKENS,
         Button: LIGHT_BUTTON_TOKENS,

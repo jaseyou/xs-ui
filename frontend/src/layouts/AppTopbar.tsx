@@ -367,17 +367,19 @@ export default function AppTopbar() {
     <header className="ant-topbar" style={{ '--topbar-height': '56px' } as CSSProperties}>
       <div className="topbar-brand">
         <span className="topbar-logo" aria-hidden>
-          <svg
-            viewBox="0 0 24 24"
-            width="16"
-            height="16"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.6"
-            strokeLinecap="round"
-          >
-            <path d="M6 5l6 7-6 7" />
-            <path d="M18 5l-6 7 6 7" />
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            {/* 六角星芒,与 PWA 图标一致 */}
+            {[0, 60, 120].map((deg) => (
+              <rect
+                key={deg}
+                x="11"
+                y="3"
+                width="2.6"
+                height="18"
+                rx="1.3"
+                transform={`rotate(${deg} 12 12)`}
+              />
+            ))}
           </svg>
         </span>
         <span className="topbar-brand-text">{BRAND_NAME}</span>

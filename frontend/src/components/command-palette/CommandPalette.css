@@ -117,7 +117,7 @@ html[data-theme='ultra-dark'] .command-palette-modal {
   font-size: 24px;
   width: 28px;
   height: 28px;
-  color: #722ed1;
+  color: #d97757;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -126,7 +126,7 @@ html[data-theme='ultra-dark'] .command-palette-modal {
 }
 
 .command-palette-search-icon.spinning {
-  color: #722ed1;
+  color: #d97757;
   animation: cp-spin 0.8s linear infinite;
 }
 
@@ -263,7 +263,7 @@ html[data-theme='ultra-dark'] .command-palette-modal {
 
 .command-palette-modal.light .command-palette-item.active {
   background: #e6f4ff;
-  color: #531dab;
+  color: #c4633f;
 }
 
 .command-palette-modal.dark .command-palette-item.active {
@@ -353,7 +353,7 @@ html[data-theme='ultra-dark'] .command-palette-modal {
 }
 
 .command-palette-modal.light .command-palette-action-btn:hover {
-  color: #531dab;
+  color: #c4633f;
   background: rgba(0, 0, 0, 0.06);
 }
 

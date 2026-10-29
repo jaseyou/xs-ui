@@ -796,7 +796,7 @@ const COLORS = {
   success: '#389e0a',
   warning: '#faad14',
   danger: '#ff4d4f',
-  purple: '#722ed1',
+  purple: '#d97757',
 } as const;
 
 export type UsageColor = 'purple' | 'green' | 'orange' | 'red';

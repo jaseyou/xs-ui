@@ -121,7 +121,7 @@ const METRICS: MetricDef[] = [
     unit: 'B/s',
     stroke: '#eb2f96',
     key2: 'diskWrite',
-    stroke2: '#722ed1',
+    stroke2: '#d97757',
     name1: 'Read',
     name2: 'Write',
   },
