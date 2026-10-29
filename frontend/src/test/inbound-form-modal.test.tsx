@@ -1,9 +1,10 @@
-import { describe, it, expect, onTestFinished, vi } from 'vitest';
+import { describe, it, expect, onTestFinished, beforeAll, vi } from 'vitest';
 import { screen, act, render, cleanup, fireEvent, waitFor } from '@testing-library/react';
 
 import InboundFormModal from '@/pages/inbounds/form/InboundFormModal';
 import { DBInbound } from '@/models/dbinbound';
 import { ThemeProvider } from '@/hooks/useTheme';
+import { SimpleModeProvider } from '@/hooks/useSimpleMode';
 import { HttpUtil } from '@/utils';
 import { Protocols } from '@/schemas/primitives';
 import {
@@ -14,6 +15,11 @@ import {
 } from './test-utils';
 
 const { messageError } = vi.hoisted(() => ({ messageError: vi.fn() }));
+
+// TLS 证书校验用例需要安全页签:强制专家模式(简单模式会隐藏该页签)。
+beforeAll(() => {
+  localStorage.setItem('xui:simple-mode', 'false');
+});
 
 vi.mock('antd', async (importOriginal) => {
   const actual = await importOriginal<typeof import('antd')>();
@@ -28,15 +34,18 @@ vi.mock('antd', async (importOriginal) => {
 
 function renderModal() {
   return renderWithProviders(
-    <InboundFormModal
-      open
-      mode="add"
-      dbInbound={null}
-      dbInbounds={[]}
-      availableNodes={[]}
-      onClose={() => {}}
-      onSaved={() => {}}
-    />,
+    <SimpleModeProvider>
+      <InboundFormModal
+        open
+        mode="add"
+        dbInbound={null}
+        dbInbounds={[]}
+        availableNodes={[]}
+        onClose={() => {}}
+        onSaved={() => {}}
+      />
+      ,
+    </SimpleModeProvider>,
   );
 }
 
@@ -101,15 +110,18 @@ function cloneLikeVlessInbound(target: string) {
 
 function renderCloneLikeEdit(dbInbound: DBInbound) {
   renderWithProviders(
-    <InboundFormModal
-      open
-      mode="edit"
-      dbInbound={dbInbound}
-      dbInbounds={[dbInbound]}
-      availableNodes={[]}
-      onClose={() => {}}
-      onSaved={() => {}}
-    />,
+    <SimpleModeProvider>
+      <InboundFormModal
+        open
+        mode="edit"
+        dbInbound={dbInbound}
+        dbInbounds={[dbInbound]}
+        availableNodes={[]}
+        onClose={() => {}}
+        onSaved={() => {}}
+      />
+      ,
+    </SimpleModeProvider>,
   );
 }
 
@@ -149,35 +161,38 @@ describe('InboundFormModal', () => {
 
   it('preserves custom share address strategy when editing a local inbound', async () => {
     renderWithProviders(
-      <InboundFormModal
-        open
-        mode="edit"
-        dbInbound={
-          new DBInbound({
-            id: 1,
-            port: 12345,
-            listen: '',
-            protocol: 'shadowsocks',
-            remark: 'edge',
-            enable: true,
-            settings: {
-              method: '2022-blake3-aes-128-gcm',
-              password: 'server-password',
-              network: 'tcp,udp',
-              clients: [],
-            },
-            streamSettings: { network: 'tcp', security: 'none', tcpSettings: {} },
-            sniffing: { enabled: false },
-            nodeId: null,
-            shareAddrStrategy: 'custom',
-            shareAddr: 'edge.example.test',
-          })
-        }
-        dbInbounds={[]}
-        availableNodes={[]}
-        onClose={() => {}}
-        onSaved={() => {}}
-      />,
+      <SimpleModeProvider>
+        <InboundFormModal
+          open
+          mode="edit"
+          dbInbound={
+            new DBInbound({
+              id: 1,
+              port: 12345,
+              listen: '',
+              protocol: 'shadowsocks',
+              remark: 'edge',
+              enable: true,
+              settings: {
+                method: '2022-blake3-aes-128-gcm',
+                password: 'server-password',
+                network: 'tcp,udp',
+                clients: [],
+              },
+              streamSettings: { network: 'tcp', security: 'none', tcpSettings: {} },
+              sniffing: { enabled: false },
+              nodeId: null,
+              shareAddrStrategy: 'custom',
+              shareAddr: 'edge.example.test',
+            })
+          }
+          dbInbounds={[]}
+          availableNodes={[]}
+          onClose={() => {}}
+          onSaved={() => {}}
+        />
+        ,
+      </SimpleModeProvider>,
     );
 
     const shareAddrInput = await screen.findByDisplayValue('edge.example.test');
@@ -186,30 +201,33 @@ describe('InboundFormModal', () => {
 
   it('uses Hosts instead of showing the custom share address fields for MTProto', async () => {
     renderWithProviders(
-      <InboundFormModal
-        open
-        mode="edit"
-        dbInbound={
-          new DBInbound({
-            id: 2,
-            port: 4060,
-            listen: '',
-            protocol: 'mtproto',
-            remark: 'proxy',
-            enable: true,
-            settings: { clients: [] },
-            streamSettings: {},
-            sniffing: { enabled: false },
-            nodeId: null,
-            shareAddrStrategy: 'custom',
-            shareAddr: 'proxy.example.test',
-          })
-        }
-        dbInbounds={[]}
-        availableNodes={[]}
-        onClose={() => {}}
-        onSaved={() => {}}
-      />,
+      <SimpleModeProvider>
+        <InboundFormModal
+          open
+          mode="edit"
+          dbInbound={
+            new DBInbound({
+              id: 2,
+              port: 4060,
+              listen: '',
+              protocol: 'mtproto',
+              remark: 'proxy',
+              enable: true,
+              settings: { clients: [] },
+              streamSettings: {},
+              sniffing: { enabled: false },
+              nodeId: null,
+              shareAddrStrategy: 'custom',
+              shareAddr: 'proxy.example.test',
+            })
+          }
+          dbInbounds={[]}
+          availableNodes={[]}
+          onClose={() => {}}
+          onSaved={() => {}}
+        />
+        ,
+      </SimpleModeProvider>,
     );
 
     await act(async () => {

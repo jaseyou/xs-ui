@@ -233,10 +233,10 @@ func buildTLS(stream map[string]any) (map[string]any, error) {
 		}
 		shortIds := stringList(rs, "shortIds")
 		out["reality"] = map[string]any{
-			"enabled":    true,
-			"handshake":  map[string]any{"server": host, "server_port": port},
+			"enabled":     true,
+			"handshake":   map[string]any{"server": host, "server_port": port},
 			"private_key": privateKey,
-			"short_id":   shortIds,
+			"short_id":    shortIds,
 		}
 		return out, nil
 	default:
@@ -336,23 +336,6 @@ func stringSetting(m map[string]any, key string) string {
 	}
 	v, _ := m[key].(string)
 	return v
-}
-
-func intSetting(m map[string]any, key string) int {
-	if m == nil {
-		return 0
-	}
-	switch v := m[key].(type) {
-	case float64:
-		return int(v)
-	case int:
-		return v
-	case string:
-		n, _ := strconv.Atoi(v)
-		return n
-	default:
-		return 0
-	}
 }
 
 func stringList(m map[string]any, key string) []string {

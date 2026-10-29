@@ -3204,7 +3204,10 @@ export const SCHEMAS: Record<string, unknown> = {
           "mtproto",
           "amneziawg",
           "tuic",
-          "masque"
+          "masque",
+          "anytls",
+          "shadowtls",
+          "naive"
         ],
         "example": "vless",
         "type": "string"
@@ -3595,7 +3598,7 @@ export const SCHEMAS: Record<string, unknown> = {
     "type": "object"
   },
   "Node": {
-    "description": "Node represents a remote 3x-ui panel registered with the central panel.\nThe central panel polls each node's existing /panel/api/server/status\nendpoint over HTTP using the per-node ApiToken to populate the runtime\nstatus fields below.",
+    "description": "Node represents a remote xs-ui panel registered with the central panel.\nThe central panel polls each node's existing /panel/api/server/status\nendpoint over HTTP using the per-node ApiToken to populate the runtime\nstatus fields below.",
     "properties": {
       "activeCount": {
         "example": 23,
@@ -4338,7 +4341,7 @@ export const SCHEMAS: Record<string, unknown> = {
         "type": "array"
       },
       "installCommand": {
-        "example": "sudo /usr/local/x-ui/x-ui install-awg-kernel",
+        "example": "sudo /usr/local/xs-ui/xs-ui install-awg-kernel",
         "type": "string"
       },
       "ready": {
@@ -4618,7 +4621,7 @@ export const SCHEMAS: Record<string, unknown> = {
     "type": "object"
   },
   "Setting": {
-    "description": "Setting stores key-value configuration settings for the 3x-ui panel.",
+    "description": "Setting stores key-value configuration settings for the xs-ui panel.",
     "properties": {
       "id": {
         "type": "integer"
@@ -4638,7 +4641,7 @@ export const SCHEMAS: Record<string, unknown> = {
     "type": "object"
   },
   "Sponsor": {
-    "description": "Sponsor is one paid placement published in the repo's sponsors.json.",
+    "description": "Sponsor is one paid placement published by the configured sponsor source.",
     "properties": {
       "enable": {
         "example": true,
@@ -4656,7 +4659,7 @@ export const SCHEMAS: Record<string, unknown> = {
         "type": "string"
       },
       "link": {
-        "example": "https://acme.example/?utm_source=3x-ui",
+        "example": "https://acme.example/?utm_source=xs-ui",
         "type": "string"
       },
       "logo": {
@@ -4930,7 +4933,7 @@ export const SCHEMAS: Record<string, unknown> = {
     "type": "object"
   },
   "User": {
-    "description": "User represents a user account in the 3x-ui panel.",
+    "description": "User represents a user account in the xs-ui panel.",
     "properties": {
       "id": {
         "type": "integer"

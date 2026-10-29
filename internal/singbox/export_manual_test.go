@@ -13,6 +13,7 @@ import (
 //	go test ./internal/singbox/ -run TestExportConfigForManualCheck
 //
 // then validate the result with a real sing-box binary:
+//
 //	sing-box check -c /tmp/sing-box-check.json
 func TestExportConfigForManualCheck(t *testing.T) {
 	if os.Getenv("SINGBOX_EXPORT") == "" {

@@ -384,7 +384,6 @@ func previousRunIsTerminal() bool {
 	return status.RunID == strconv.FormatInt(updateRunID, 10) && status.State != updateStatePending
 }
 
-
 // applyGitHubToken attaches the XUI_GH_TOKEN bearer token to GitHub requests
 // so a private fork repository can serve update.sh and release metadata. The
 // update.sh script itself reads the same token (env or /etc/xs-ui/gh.token) for

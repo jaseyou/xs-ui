@@ -27,7 +27,11 @@
   height: 28px;
   border-radius: 8px;
   color: var(--ant-color-white, #fff);
-  background: linear-gradient(135deg, var(--ant-color-primary), color-mix(in srgb, var(--ant-color-primary) 70%, #000));
+  background: linear-gradient(
+    135deg,
+    var(--ant-color-primary),
+    color-mix(in srgb, var(--ant-color-primary) 70%, #000)
+  );
 }
 
 .topbar-brand-text {

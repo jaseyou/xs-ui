@@ -1,6 +1,7 @@
 package singbox
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -118,7 +119,7 @@ func Stop() {
 func startLocked(hash string) error {
 	intentional = false
 	configHash = hash
-	c := exec.Command(GetBinaryPath(), "run", "-c", GetConfigPath())
+	c := exec.CommandContext(context.Background(), GetBinaryPath(), "run", "-c", GetConfigPath())
 	if err := c.Start(); err != nil {
 		return err
 	}

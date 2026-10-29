@@ -1112,6 +1112,23 @@ prompt_and_setup_ssl() {
     esac
 }
 
+
+# 自动配置面板 HTTPS:检测伪装站部署脚本签发的证书(/root/cert/<域名>/),
+# 找到最新的一组直接启用,免去手动到设置页填写。未检测到则保持 HTTP。
+configure_panel_cert() {
+    local newest="" f
+    for f in /root/cert/*/fullchain.pem; do
+        [[ -s "$f" ]] || continue
+        [[ -z "$newest" || "$f" -nt "$newest" ]] && newest="$f"
+    done
+    [[ -n "$newest" ]] || return 0
+    local dir
+    dir=$(dirname "$newest")
+    if "${xs_ui_folder}/xs-ui" setting -webCert "$newest" -webCertKey "$dir/privkey.pem" > /dev/null 2>&1; then
+        echo -e "${green}Detected certificate for $(basename "$dir") -- panel HTTPS enabled${plain}"
+    fi
+}
+
 config_after_install() {
     local existing_hasDefaultCredential=$(${xui_folder}/xs-ui setting -show true | grep -Eo 'hasDefaultCredential: .+' | awk '{print $2}')
     local existing_webBasePath=$(${xui_folder}/xs-ui setting -show true | grep -Eo 'webBasePath: .+' | awk '{print $2}' | sed 's#^/##')
@@ -1954,6 +1971,7 @@ install_xs-ui() {
     chmod +x /usr/bin/xs-ui
     mkdir -p /var/log/xs-ui
     config_after_install
+    configure_panel_cert
 
     # Etckeeper compatibility
     if [ -d "/etc/.git" ]; then

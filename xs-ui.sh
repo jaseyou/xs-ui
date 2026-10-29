@@ -316,6 +316,7 @@ uninstall() {
         rc-service xs-ui stop
         rc-update del xs-ui
         rm /etc/init.d/xs-ui -f
+        rm /usr/bin/xs-ui /usr/bin/x-ui -f
     else
         systemctl stop xs-ui
         systemctl disable xs-ui

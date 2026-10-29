@@ -13,9 +13,12 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
+	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"syscall"
+	"time"
 	_ "unsafe"
 
 	"github.com/jaseyou/xs-ui/v3/internal/config"
@@ -748,6 +751,18 @@ func main() {
 		if enabletgbot {
 			updateTgbotEnableSts(enabletgbot)
 		}
+		changed := map[string]bool{}
+		settingCmd.Visit(func(f *flag.Flag) { changed[f.Name] = true })
+		if reset ||
+			changed["port"] || changed["username"] || changed["password"] ||
+			changed["webBasePath"] || changed["listenIP"] || changed["webCert"] ||
+			changed["webCertKey"] || changed["resetTwoFactor"] ||
+			changed["tgbottoken"] || changed["tgbotchatid"] || changed["tgbotRuntime"] ||
+			changed["enabletgbot"] {
+			// The CLI writes straight to the database; a running panel only
+			// re-reads it on restart. Reload it now so settings actually apply.
+			restartRunningPanel()
+		}
 	case "cert":
 		err := settingCmd.Parse(os.Args[2:])
 		if err != nil {
@@ -765,6 +780,31 @@ func main() {
 		runCmd.Usage()
 		fmt.Println()
 		settingCmd.Usage()
+	}
+}
+
+// restartRunningPanel nudges a live panel to re-read settings written by the
+// CLI: the running process keeps its in-memory copy until SIGHUP triggers a
+// full web-server restart. Best effort — a stopped panel picks the settings up
+// on its next start.
+func restartRunningPanel() {
+	if runtime.GOOS == "windows" {
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	out, err := exec.CommandContext(ctx, "pgrep", "-x", filepath.Base(os.Args[0])).Output()
+	if err != nil {
+		return
+	}
+	for _, pidStr := range strings.Fields(string(out)) {
+		pid, err := strconv.Atoi(pidStr)
+		if err != nil || pid == os.Getpid() {
+			continue
+		}
+		if err := syscall.Kill(pid, syscall.SIGHUP); err == nil {
+			fmt.Println("Running panel reloaded to apply the new settings.")
+		}
 	}
 }
 
