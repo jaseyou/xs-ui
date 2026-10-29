@@ -21,7 +21,7 @@ import (
 func TestStatusSampleDoesNotWaitOnPublicIPLookup(t *testing.T) {
 	dbDir := t.TempDir()
 	t.Setenv("XUI_DB_FOLDER", dbDir)
-	dbtest.InitDB(t, filepath.Join(dbDir, "x-ui.db"))
+	dbtest.InitDB(t, filepath.Join(dbDir, "xs-ui.db"))
 
 	release := make(chan struct{})
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -286,7 +286,7 @@ func TestPublicIPRefreshIsSingleFlightAndKeepsCachedReadsAvailable(t *testing.T)
 func TestPublicIPStatusUsesRefreshedAddressWithoutBlocking(t *testing.T) {
 	dbDir := t.TempDir()
 	t.Setenv("XUI_DB_FOLDER", dbDir)
-	dbtest.InitDB(t, filepath.Join(dbDir, "x-ui.db"))
+	dbtest.InitDB(t, filepath.Join(dbDir, "xs-ui.db"))
 	savedHistory := systemMetrics
 	systemMetrics = newMetricHistory()
 	t.Cleanup(func() { systemMetrics = savedHistory })

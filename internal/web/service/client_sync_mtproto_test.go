@@ -12,7 +12,7 @@ import (
 func TestSyncInbound_UpdatesMtprotoSecretAndAdTag(t *testing.T) {
 	dbDir := t.TempDir()
 	t.Setenv("XUI_DB_FOLDER", dbDir)
-	dbtest.InitDB(t, filepath.Join(dbDir, "x-ui.db"))
+	dbtest.InitDB(t, filepath.Join(dbDir, "xs-ui.db"))
 
 	db := database.GetDB()
 

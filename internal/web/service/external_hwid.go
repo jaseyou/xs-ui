@@ -32,7 +32,7 @@ func ExternalSubscriptionHwid() string {
 			return strings.TrimSpace(row.Value)
 		}
 	}
-	hwid := "3x-ui-server-" + uuid.NewString()
+	hwid := "xs-ui-server-" + uuid.NewString()
 	row = model.Setting{Key: externalSubHwidKey, Value: hwid}
 	if err := db.Where(model.Setting{Key: externalSubHwidKey}).FirstOrCreate(&row).Error; err != nil {
 		logger.Warningf("persisting the external subscription hwid failed: %v", err)

@@ -43,7 +43,7 @@ func newLinksCallbackTgbot(t *testing.T, email string) (*Tgbot, func(string) int
 	swapTestBot(t, mock.URL)
 	t.Cleanup(mock.Close)
 
-	dbtest.InitDB(t, filepath.Join(t.TempDir(), "x-ui.db"))
+	dbtest.InitDB(t, filepath.Join(t.TempDir(), "xs-ui.db"))
 
 	inbound := &model.Inbound{
 		UserId:   1,

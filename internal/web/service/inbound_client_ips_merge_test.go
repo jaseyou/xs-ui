@@ -29,7 +29,7 @@ func setupClientIpTestDB(t *testing.T) {
 	t.Cleanup(cleanup)
 	dbDir := t.TempDir()
 	t.Setenv("XUI_DB_FOLDER", dbDir)
-	dbtest.InitDB(t, filepath.Join(dbDir, "x-ui.db"))
+	dbtest.InitDB(t, filepath.Join(dbDir, "xs-ui.db"))
 }
 
 func marshalIps(t *testing.T, entries ...model.ClientIpEntry) string {

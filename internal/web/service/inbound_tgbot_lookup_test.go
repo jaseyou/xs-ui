@@ -23,7 +23,7 @@ import (
 func TestGetClientTrafficTgBot_SettingsSerializationStyles(t *testing.T) {
 	dbDir := t.TempDir()
 	t.Setenv("XUI_DB_FOLDER", dbDir)
-	dbtest.InitDB(t, filepath.Join(dbDir, "x-ui.db"))
+	dbtest.InitDB(t, filepath.Join(dbDir, "xs-ui.db"))
 
 	db := database.GetDB()
 
@@ -65,7 +65,7 @@ func TestGetClientTrafficTgBot_SettingsSerializationStyles(t *testing.T) {
 	if err := database.CloseDB(); err != nil {
 		t.Fatal(err)
 	}
-	if err := database.InitDB(filepath.Join(dbDir, "x-ui.db")); err != nil {
+	if err := database.InitDB(filepath.Join(dbDir, "xs-ui.db")); err != nil {
 		t.Fatal(err)
 	}
 	var records []model.ClientRecord
@@ -109,7 +109,7 @@ func (l *tgLookupSQL) Trace(_ context.Context, _ time.Time, fc func() (string, i
 }
 
 func TestGetClientTrafficTgBot_Indexed(t *testing.T) {
-	dbtest.InitDB(t, filepath.Join(t.TempDir(), "x-ui.db"))
+	dbtest.InitDB(t, filepath.Join(t.TempDir(), "xs-ui.db"))
 	testIndexedTgLookup(t, database.GetDB())
 }
 
@@ -118,7 +118,7 @@ func TestGetClientTrafficTgBot_IndexedPostgres(t *testing.T) {
 }
 
 func TestGetClientTrafficTgBot_LargeAccount(t *testing.T) {
-	dbtest.InitDB(t, filepath.Join(t.TempDir(), "x-ui.db"))
+	dbtest.InitDB(t, filepath.Join(t.TempDir(), "xs-ui.db"))
 	db := database.GetDB()
 	inbound := &model.Inbound{UserId: 1, Tag: "large-tg", Port: 41888, Protocol: model.VLESS, Settings: `{"clients":[]}`}
 	if err := db.Create(inbound).Error; err != nil {

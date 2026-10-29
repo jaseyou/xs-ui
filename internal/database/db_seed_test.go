@@ -41,7 +41,7 @@ func TestInitDB_GeneratesPerPanelSubscriptionPaths(t *testing.T) {
 		return paths
 	}
 
-	firstDB := filepath.Join(t.TempDir(), "x-ui.db")
+	firstDB := filepath.Join(t.TempDir(), "xs-ui.db")
 	first := loadPaths(firstDB)
 	reloaded := loadPaths(firstDB)
 	for key, firstPath := range first {
@@ -50,7 +50,7 @@ func TestInitDB_GeneratesPerPanelSubscriptionPaths(t *testing.T) {
 		}
 	}
 
-	second := loadPaths(filepath.Join(t.TempDir(), "x-ui.db"))
+	second := loadPaths(filepath.Join(t.TempDir(), "xs-ui.db"))
 	for key, firstPath := range first {
 		if firstPath == second[key] {
 			t.Fatalf("%s reused across panels: %q", key, firstPath)
@@ -61,7 +61,7 @@ func TestInitDB_GeneratesPerPanelSubscriptionPaths(t *testing.T) {
 // Every launcher but install.sh serves the panel on the database as InitDB left
 // it, so a credential seeded here is one anyone on the network can log in with.
 func TestInitDBLeavesNoGuessableCredential(t *testing.T) {
-	if err := InitDB(filepath.Join(t.TempDir(), "x-ui.db")); err != nil {
+	if err := InitDB(filepath.Join(t.TempDir(), "xs-ui.db")); err != nil {
 		t.Fatalf("InitDB: %v", err)
 	}
 	t.Cleanup(func() { _ = CloseDB() })
@@ -80,7 +80,7 @@ func TestInitDBLeavesNoGuessableCredential(t *testing.T) {
 // The server prints what EnsureFirstUser returns as the only copy of the first
 // login, so it must be the stored credential, and a restart must not mint another.
 func TestEnsureFirstUserCreatesOneWorkingCredential(t *testing.T) {
-	if err := InitDB(filepath.Join(t.TempDir(), "x-ui.db")); err != nil {
+	if err := InitDB(filepath.Join(t.TempDir(), "xs-ui.db")); err != nil {
 		t.Fatalf("InitDB: %v", err)
 	}
 	t.Cleanup(func() { _ = CloseDB() })
@@ -110,7 +110,7 @@ func TestEnsureFirstUserCreatesOneWorkingCredential(t *testing.T) {
 func TestSeedClientsFromInboundJSON_IsIdempotentAgainstExistingClients(t *testing.T) {
 	dbDir := t.TempDir()
 	t.Setenv("XUI_DB_FOLDER", dbDir)
-	if err := InitDB(filepath.Join(dbDir, "x-ui.db")); err != nil {
+	if err := InitDB(filepath.Join(dbDir, "xs-ui.db")); err != nil {
 		t.Fatalf("InitDB failed: %v", err)
 	}
 	t.Cleanup(func() { _ = CloseDB() })
@@ -172,7 +172,7 @@ func TestSeedClientsFromInboundJSON_IsIdempotentAgainstExistingClients(t *testin
 func TestNormalizeInboundClientSubId_FillsMissingAndPreservesExisting(t *testing.T) {
 	dbDir := t.TempDir()
 	t.Setenv("XUI_DB_FOLDER", dbDir)
-	if err := InitDB(filepath.Join(dbDir, "x-ui.db")); err != nil {
+	if err := InitDB(filepath.Join(dbDir, "xs-ui.db")); err != nil {
 		t.Fatalf("InitDB failed: %v", err)
 	}
 	t.Cleanup(func() { _ = CloseDB() })
@@ -255,7 +255,7 @@ func TestNormalizeInboundClientSubId_FillsMissingAndPreservesExisting(t *testing
 func TestNormalizeSettingPaths_RepairsLegacyValues(t *testing.T) {
 	dbDir := t.TempDir()
 	t.Setenv("XUI_DB_FOLDER", dbDir)
-	if err := InitDB(filepath.Join(dbDir, "x-ui.db")); err != nil {
+	if err := InitDB(filepath.Join(dbDir, "xs-ui.db")); err != nil {
 		t.Fatalf("InitDB failed: %v", err)
 	}
 	t.Cleanup(func() { _ = CloseDB() })

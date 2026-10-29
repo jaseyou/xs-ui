@@ -372,7 +372,7 @@ func (s *OutboundSubscriptionService) fetchAndStore(sub *model.OutboundSubscript
 		userAgent = defaultOutboundSubscriptionUserAgent
 	}
 	req.Header.Set("User-Agent", userAgent)
-	// A 3x-ui donor with an HWID limit answers 404 when the header is empty (#6574).
+	// A xs-ui donor with an HWID limit answers 404 when the header is empty (#6574).
 	if hwid := ExternalSubscriptionHwid(); hwid != "" {
 		req.Header.Set("X-HWID", hwid)
 	}

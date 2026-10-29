@@ -116,7 +116,7 @@ func preparePanel(t *testing.T, bin, name string) *panel {
 	p.cli("setting", "-username", "e2e", "-password", "e2e-pass", "-port", strconv.Itoa(p.port), "-webBasePath", "/")
 	sharedDBMu.Lock()
 	defer sharedDBMu.Unlock()
-	if err := database.InitDB(filepath.Join(p.dir, "db", "x-ui.db")); err != nil {
+	if err := database.InitDB(filepath.Join(p.dir, "db", "xs-ui.db")); err != nil {
 		t.Fatalf("%s: open db: %v", name, err)
 	}
 	db := database.GetDB()
@@ -185,7 +185,7 @@ func (p *panel) deleteInboundRow(id int) {
 	}
 	sharedDBMu.Lock()
 	defer sharedDBMu.Unlock()
-	if err := database.InitDB(filepath.Join(p.dir, "db", "x-ui.db")); err != nil {
+	if err := database.InitDB(filepath.Join(p.dir, "db", "xs-ui.db")); err != nil {
 		p.t.Fatalf("%s: open db: %v", p.name, err)
 	}
 	defer func() { _ = database.CloseDB() }()
@@ -204,7 +204,7 @@ func (p *panel) seedClientIpAttribution(email, ips string) string {
 	}
 	sharedDBMu.Lock()
 	defer sharedDBMu.Unlock()
-	if err := database.InitDB(filepath.Join(p.dir, "db", "x-ui.db")); err != nil {
+	if err := database.InitDB(filepath.Join(p.dir, "db", "xs-ui.db")); err != nil {
 		p.t.Fatalf("%s: open db: %v", p.name, err)
 	}
 	defer func() { _ = database.CloseDB() }()

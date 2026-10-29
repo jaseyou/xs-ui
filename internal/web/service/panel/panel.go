@@ -138,7 +138,7 @@ func (s *PanelService) RestartPanel(delay time.Duration) error {
 	return nil
 }
 
-// GetUpdateInfo checks GitHub for the latest 3x-ui release. When the dev channel
+// GetUpdateInfo checks GitHub for the latest xs-ui release. When the dev channel
 // is enabled on a dev build it compares commits against the rolling dev release;
 // otherwise it compares versions against the latest stable tag.
 func (s *PanelService) GetUpdateInfo() (*PanelUpdateInfo, error) {
@@ -264,7 +264,7 @@ func (s *PanelService) startUpdate(useDev bool) (int64, error) {
 	proxyEnv := updateProxyEnvVars()
 
 	if systemdRun, err := exec.LookPath("systemd-run"); err == nil {
-		unitName := fmt.Sprintf("x-ui-web-update-%d", time.Now().Unix())
+		unitName := fmt.Sprintf("xs-ui-web-update-%d", time.Now().Unix())
 		args := []string{
 			"--unit", unitName,
 			"--setenv", "XUI_MAIN_FOLDER=" + mainFolder,
@@ -277,7 +277,7 @@ func (s *PanelService) startUpdate(useDev bool) (int64, error) {
 			args = append(args, "--setenv", kv)
 		}
 		// Private-repo downloads inside update.sh need the token: the script
-		// reads /etc/x-ui/gh.token as fallback, but an env-provided token is
+		// reads /etc/xs-ui/gh.token as fallback, but an env-provided token is
 		// forwarded here so it works before the file exists.
 		if ghToken := strings.TrimSpace(os.Getenv("XUI_GH_TOKEN")); ghToken != "" {
 			args = append(args, "--setenv", "XUI_GH_TOKEN="+ghToken)
@@ -387,7 +387,7 @@ func previousRunIsTerminal() bool {
 
 // applyGitHubToken attaches the XUI_GH_TOKEN bearer token to GitHub requests
 // so a private fork repository can serve update.sh and release metadata. The
-// update.sh script itself reads the same token (env or /etc/x-ui/gh.token) for
+// update.sh script itself reads the same token (env or /etc/xs-ui/gh.token) for
 // the release downloads it performs.
 func applyGitHubToken(req *http.Request) {
 	if token := strings.TrimSpace(os.Getenv("XUI_GH_TOKEN")); token != "" {
@@ -417,7 +417,7 @@ func downloadPanelUpdater() (string, error) {
 		return "", fmt.Errorf("download panel updater: unexpected HTTP %d", resp.StatusCode)
 	}
 
-	file, err := os.CreateTemp("", "3x-ui-update-*.sh")
+	file, err := os.CreateTemp("", "xs-ui-update-*.sh")
 	if err != nil {
 		return "", err
 	}
@@ -543,7 +543,7 @@ func resolveUpdateFolders() (string, string) {
 		}
 	}
 	if mainFolder == "" {
-		mainFolder = "/usr/local/x-ui"
+		mainFolder = "/usr/local/xs-ui"
 	}
 
 	serviceFolder := os.Getenv("XUI_SERVICE")

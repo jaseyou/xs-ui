@@ -267,7 +267,7 @@ func (r *remoteRoutingResolver) fetch(key remoteRoutingKey, previous remoteRouti
 	if err != nil {
 		return remoteRoutingCacheEntry{}, err
 	}
-	req.Header.Set("User-Agent", "3x-ui-remote-routing/1.0")
+	req.Header.Set("User-Agent", "xs-ui-remote-routing/1.0")
 	if hasPrevious {
 		if previous.ETag != "" {
 			req.Header.Set("If-None-Match", previous.ETag)

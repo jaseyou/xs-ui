@@ -10,7 +10,7 @@ import (
 )
 
 func ownershipMarker(name string) string {
-	return "# 3x-ui-owned-amneziawg: " + name
+	return "# xs-ui-owned-amneziawg: " + name
 }
 
 func parseOwnedInterfaceName(name string) (int, bool) {

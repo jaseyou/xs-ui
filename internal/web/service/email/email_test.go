@@ -19,7 +19,7 @@ import (
 )
 
 func TestBuildMessageIsRFC5322(t *testing.T) {
-	raw := buildMessage("panel@example.com", "3x-ui", []string{"a@example.com", "b@example.com"}, "Тест", "<b>hi</b>")
+	raw := buildMessage("panel@example.com", "xs-ui", []string{"a@example.com", "b@example.com"}, "Тест", "<b>hi</b>")
 
 	msg, err := mail.ReadMessage(strings.NewReader(string(raw)))
 	if err != nil {
@@ -30,8 +30,8 @@ func TestBuildMessageIsRFC5322(t *testing.T) {
 	if err != nil {
 		t.Fatalf("From header does not parse: %v", err)
 	}
-	if from.Name != "3x-ui" || from.Address != "panel@example.com" {
-		t.Errorf("From = %q <%q>, want name %q addr %q", from.Name, from.Address, "3x-ui", "panel@example.com")
+	if from.Name != "xs-ui" || from.Address != "panel@example.com" {
+		t.Errorf("From = %q <%q>, want name %q addr %q", from.Name, from.Address, "xs-ui", "panel@example.com")
 	}
 
 	if _, err := msg.Header.Date(); err != nil {
@@ -132,7 +132,7 @@ func startFakeSMTPServer(t *testing.T) (string, func() []string) {
 }
 
 func TestSendUsesBareAddressFromNameAddrSmtpFrom(t *testing.T) {
-	dbtest.InitDB(t, filepath.Join(t.TempDir(), "x-ui.db"))
+	dbtest.InitDB(t, filepath.Join(t.TempDir(), "xs-ui.db"))
 
 	addr, recordedLines := startFakeSMTPServer(t)
 	host, portStr, err := net.SplitHostPort(addr)
@@ -153,7 +153,7 @@ func TestSendUsesBareAddressFromNameAddrSmtpFrom(t *testing.T) {
 	}
 	mustSet("host", settingService.SetSmtpHost(host))
 	mustSet("port", settingService.SetSmtpPort(port))
-	mustSet("from", settingService.SetSmtpFrom("3x-ui Panel <panel@example.com>"))
+	mustSet("from", settingService.SetSmtpFrom("xs-ui Panel <panel@example.com>"))
 	mustSet("to", settingService.SetSmtpTo("admin@example.com"))
 	mustSet("encryption", settingService.SetSmtpEncryptionType("none"))
 
@@ -173,13 +173,13 @@ func TestSendUsesBareAddressFromNameAddrSmtpFrom(t *testing.T) {
 	if want := "MAIL FROM:<panel@example.com>"; mailFrom != want {
 		t.Errorf("envelope sender = %q, want %q", mailFrom, want)
 	}
-	if want := `From: "3x-ui Panel" <panel@example.com>`; fromHeader != want {
+	if want := `From: "xs-ui Panel" <panel@example.com>`; fromHeader != want {
 		t.Errorf("from header = %q, want %q", fromHeader, want)
 	}
 }
 
 func TestConnectionReportsMissingFrom(t *testing.T) {
-	dbtest.InitDB(t, filepath.Join(t.TempDir(), "x-ui.db"))
+	dbtest.InitDB(t, filepath.Join(t.TempDir(), "xs-ui.db"))
 
 	settingService := service.SettingService{}
 	mustSet := func(name string, err error) {

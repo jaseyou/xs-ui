@@ -32,7 +32,7 @@ func TestHasDefaultCredential(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			dbtest.InitDB(t, filepath.Join(t.TempDir(), "x-ui.db"))
+			dbtest.InitDB(t, filepath.Join(t.TempDir(), "xs-ui.db"))
 			if err := database.GetDB().Where("1 = 1").Delete(&model.User{}).Error; err != nil {
 				t.Fatalf("clear users: %v", err)
 			}

@@ -279,10 +279,10 @@ func TestGetSponsorsDebugReadsLocalCheckout(t *testing.T) {
 	if err := os.MkdirAll(local, 0o700); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Mkdir(filepath.Join(root, "3x-ui"), 0o700); err != nil {
+	if err := os.Mkdir(filepath.Join(root, "xs-ui"), 0o700); err != nil {
 		t.Fatal(err)
 	}
-	t.Chdir(filepath.Join(root, "3x-ui"))
+	t.Chdir(filepath.Join(root, "xs-ui"))
 	write := func(id string) {
 		t.Helper()
 		body := `{"sponsors":[{"id":"` + id + `","slots":["page"],"until":"2099-01-01T00:00:00Z","link":"https://a.example/"}]}`

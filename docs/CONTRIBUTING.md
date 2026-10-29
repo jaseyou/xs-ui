@@ -1,6 +1,6 @@
-# Contributing to 3x-ui-docs
+# Contributing to xs-ui-docs
 
-Thanks for helping improve the 3x-ui documentation and product site!
+Thanks for helping improve the xs-ui documentation and product site!
 
 ## Prerequisites
 

@@ -149,7 +149,7 @@ type Manager struct {
 	mu    sync.Mutex
 	procs map[int]*managed
 	// swept records that the one-time startup cleanup of orphaned mtg
-	// processes (survivors of a previous x-ui run) has already run.
+	// processes (survivors of a previous xs-ui run) has already run.
 	swept bool
 }
 
@@ -262,9 +262,9 @@ func (m *Manager) Ensure(inst Instance) error {
 	return m.ensureLocked(inst)
 }
 
-// sweepOrphansLocked kills mtg processes left running by a previous x-ui run,
+// sweepOrphansLocked kills mtg processes left running by a previous xs-ui run,
 // exactly once per process lifetime and before any of our own mtg are started.
-// Because x-ui owns every mtg process, anything alive at this point is an orphan
+// Because xs-ui owns every mtg process, anything alive at this point is an orphan
 // that would otherwise keep holding an inbound port with a stale secret.
 func (m *Manager) sweepOrphansLocked() {
 	if m.swept {

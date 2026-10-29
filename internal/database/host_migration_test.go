@@ -11,7 +11,7 @@ import (
 
 func initMigrateDB(t *testing.T) {
 	t.Helper()
-	if err := InitDB(filepath.Join(t.TempDir(), "x-ui.db")); err != nil {
+	if err := InitDB(filepath.Join(t.TempDir(), "xs-ui.db")); err != nil {
 		t.Fatalf("InitDB: %v", err)
 	}
 	t.Cleanup(func() { _ = CloseDB() })
@@ -113,7 +113,7 @@ func TestBackfillEmptyHostGroupIds_RepairsLegacyRows(t *testing.T) {
 // verify_peer_cert_by_name began as a boolean; AutoMigrate's cast to text turned it
 // into the cert name "0"/"1", which xray clients then fail to verify against.
 func TestMigrate_LegacyBooleanVerifyPeerCertByNameIsBlanked(t *testing.T) {
-	dbPath := filepath.Join(t.TempDir(), "x-ui.db")
+	dbPath := filepath.Join(t.TempDir(), "xs-ui.db")
 	if err := InitDB(dbPath); err != nil {
 		t.Fatalf("InitDB: %v", err)
 	}
@@ -463,7 +463,7 @@ func TestMigrateMtprotoCustomShareAddrWithUnusableSameAddressHost(t *testing.T) 
 // Mihomo X25519 was stored but ignored before it started dropping ML-KEM; a row
 // switched on back then must not change its subscription output on upgrade.
 func TestMigrate_PreexistingMihomoX25519IsResetOnce(t *testing.T) {
-	dbPath := filepath.Join(t.TempDir(), "x-ui.db")
+	dbPath := filepath.Join(t.TempDir(), "xs-ui.db")
 	if err := InitDB(dbPath); err != nil {
 		t.Fatalf("InitDB: %v", err)
 	}

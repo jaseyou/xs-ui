@@ -315,7 +315,7 @@ jobs:
       - name: shellcheck
         run: |
           shellcheck --severity=style DockerInit.sh DockerEntrypoint.sh deploy/test/smoke-noninteractive.sh
-          shellcheck --severity=error install.sh update.sh x-ui.sh
+          shellcheck --severity=error install.sh update.sh xs-ui.sh
 
   frontend:
     runs-on: ubuntu-latest

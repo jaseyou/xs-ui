@@ -1,4 +1,4 @@
-name: Release 3X-UI
+name: Release XS-UI
 
 on:
   workflow_dispatch:
@@ -15,9 +15,9 @@ on:
       - "go.sum"
       - "**.sh"
       - "frontend/**"
-      - "x-ui.service.debian"
-      - "x-ui.service.arch"
-      - "x-ui.service.rhel"
+      - "xs-ui.service.debian"
+      - "xs-ui.service.arch"
+      - "xs-ui.service.rhel"
       - ".github/workflows/release.yml"
 
 jobs:
@@ -64,7 +64,7 @@ jobs:
           npm run build
         working-directory: frontend
 
-      - name: Build 3X-UI
+      - name: Build XS-UI
         run: |
           CURL_RETRY="--retry 5 --retry-all-errors --retry-delay 3"
           fetch() { wget -q --tries=5 --waitretry=10 --retry-on-http-error=429,500,502,503 "$@"; }
@@ -98,21 +98,21 @@ jobs:
           # stable releases stay unstamped so config.IsDevBuild() returns false.
           LDFLAGS="-w -s -linkmode external -extldflags '-static'"
           if [[ "$GITHUB_REF" != refs/tags/* ]]; then
-            LDFLAGS="$LDFLAGS -X github.com/mhsanaei/3x-ui/v3/internal/config.buildCommit=${GITHUB_SHA::8} -X github.com/mhsanaei/3x-ui/v3/internal/config.buildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            LDFLAGS="$LDFLAGS -X github.com/jaseyou/xs-ui/v3/internal/config.buildCommit=${GITHUB_SHA::8} -X github.com/jaseyou/xs-ui/v3/internal/config.buildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           fi
           go build -buildvcs=true -ldflags "$LDFLAGS" -o xui-release -v .
           file xui-release
           ldd xui-release || echo "Static binary confirmed"
 
-          mkdir x-ui
-          cp xui-release x-ui/
-          cp x-ui.service.debian x-ui/
-          cp x-ui.service.arch x-ui/
-          cp x-ui.service.rhel x-ui/
-          cp x-ui.sh x-ui/
-          mv x-ui/xui-release x-ui/x-ui
-          mkdir x-ui/bin
-          cd x-ui/bin
+          mkdir xs-ui
+          cp xui-release xs-ui/
+          cp xs-ui.service.debian xs-ui/
+          cp xs-ui.service.arch xs-ui/
+          cp xs-ui.service.rhel xs-ui/
+          cp xs-ui.sh xs-ui/
+          mv xs-ui/xui-release xs-ui/xs-ui
+          mkdir xs-ui/bin
+          cd xs-ui/bin
 
           # Download dependencies
           Xray_URL="https://github.com/XTLS/Xray-core/releases/download/v26.10.21/"
@@ -197,16 +197,16 @@ jobs:
 
       - name: Package
         run: |
-          tar -zcvf x-ui-linux-${{ matrix.platform }}.tar.gz x-ui
-          sha256sum x-ui-linux-${{ matrix.platform }}.tar.gz > x-ui-linux-${{ matrix.platform }}.tar.gz.sha256
+          tar -zcvf xs-ui-linux-${{ matrix.platform }}.tar.gz xs-ui
+          sha256sum xs-ui-linux-${{ matrix.platform }}.tar.gz > xs-ui-linux-${{ matrix.platform }}.tar.gz.sha256
 
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: x-ui-linux-${{ matrix.platform }}
+          name: xs-ui-linux-${{ matrix.platform }}
           path: |
-            ./x-ui-linux-${{ matrix.platform }}.tar.gz
-            ./x-ui-linux-${{ matrix.platform }}.tar.gz.sha256
+            ./xs-ui-linux-${{ matrix.platform }}.tar.gz
+            ./xs-ui-linux-${{ matrix.platform }}.tar.gz.sha256
 
       - name: Upload files to GH release
         uses: svenstaro/upload-release-action@v2
@@ -214,7 +214,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
-          file: x-ui-linux-${{ matrix.platform }}.tar.gz*
+          file: xs-ui-linux-${{ matrix.platform }}.tar.gz*
           file_glob: true
           overwrite: true
           prerelease: true
@@ -269,7 +269,7 @@ jobs:
             mingw-w64-x86_64-sqlite3
             mingw-w64-x86_64-pkg-config
 
-      - name: Build 3X-UI for Windows (CGO)
+      - name: Build XS-UI for Windows (CGO)
         shell: msys2 {0}
         run: |
           export PATH="/c/hostedtoolcache/windows/go/$(ls /c/hostedtoolcache/windows/go | sort -V | tail -n1)/x64/bin:$PATH"
@@ -291,7 +291,7 @@ jobs:
           # Stamp the commit into per-commit (dev channel) builds only.
           LDFLAGS="-w -s"
           if [[ "$GITHUB_REF" != refs/tags/* ]]; then
-            LDFLAGS="$LDFLAGS -X github.com/mhsanaei/3x-ui/v3/internal/config.buildCommit=${GITHUB_SHA:0:8} -X github.com/mhsanaei/3x-ui/v3/internal/config.buildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            LDFLAGS="$LDFLAGS -X github.com/jaseyou/xs-ui/v3/internal/config.buildCommit=${GITHUB_SHA:0:8} -X github.com/jaseyou/xs-ui/v3/internal/config.buildDate=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           fi
           go build -buildvcs=true -ldflags "$LDFLAGS" -o xui-release.exe -v .
 
@@ -299,10 +299,10 @@ jobs:
         shell: pwsh
         run: |
           $retry = @{ MaximumRetryCount = 5; RetryIntervalSec = 10 }
-          mkdir x-ui
-          Copy-Item xui-release.exe x-ui\3x-ui.exe
-          mkdir x-ui\bin
-          cd x-ui\bin
+          mkdir xs-ui
+          Copy-Item xui-release.exe xs-ui\xs-ui.exe
+          mkdir xs-ui\bin
+          cd xs-ui\bin
 
           # Download Xray for Windows
           $Xray_URL = "https://github.com/XTLS/Xray-core/releases/download/v26.10.21/"
@@ -337,17 +337,17 @@ jobs:
       - name: Package to Zip
         shell: pwsh
         run: |
-          Compress-Archive -Path .\x-ui -DestinationPath "x-ui-windows-amd64.zip"
-          $hash = (Get-FileHash x-ui-windows-amd64.zip -Algorithm SHA256).Hash.ToLower()
-          [IO.File]::WriteAllText("$PWD\x-ui-windows-amd64.zip.sha256", "$hash  x-ui-windows-amd64.zip`n")
+          Compress-Archive -Path .\xs-ui -DestinationPath "xs-ui-windows-amd64.zip"
+          $hash = (Get-FileHash xs-ui-windows-amd64.zip -Algorithm SHA256).Hash.ToLower()
+          [IO.File]::WriteAllText("$PWD\xs-ui-windows-amd64.zip.sha256", "$hash  xs-ui-windows-amd64.zip`n")
 
       - name: Upload files to Artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: x-ui-windows-amd64
+          name: xs-ui-windows-amd64
           path: |
-            ./x-ui-windows-amd64.zip
-            ./x-ui-windows-amd64.zip.sha256
+            ./xs-ui-windows-amd64.zip
+            ./xs-ui-windows-amd64.zip.sha256
 
       - name: Upload files to GH release
         uses: svenstaro/upload-release-action@v2
@@ -355,7 +355,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref_name }}
-          file: x-ui-windows-amd64.zip*
+          file: xs-ui-windows-amd64.zip*
           file_glob: true
           overwrite: true
           prerelease: true
