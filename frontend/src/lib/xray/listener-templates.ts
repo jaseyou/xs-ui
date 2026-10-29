@@ -336,7 +336,13 @@ export const LISTENER_TEMPLATES: ListenerTemplate[] = [
           version: 2,
           core: 'singbox',
           obfs: { type: 'salamander', password: ctx.keys.obfsPassword },
-          clients: [clientBase(ctx.email, { password: ctx.keys.clientPassword })],
+          // Panel-side validation reads client.auth for hysteria clients.
+          clients: [
+            clientBase(ctx.email, {
+              auth: ctx.keys.clientPassword,
+              password: ctx.keys.clientPassword,
+            }),
+          ],
         },
         tlsStream(ctx, ['h3']),
         'Hysteria2-TLS-BBR-Salamander',
@@ -368,6 +374,9 @@ export const LISTENER_TEMPLATES: ListenerTemplate[] = [
           },
           clients: [
             clientBase(ctx.email, {
+              // Panel-side validation reads client.id (UUID); the embedded TUIC
+              // server reads uuid — set both.
+              id: ctx.keys.clientUuid,
               uuid: ctx.keys.clientUuid,
               password: ctx.keys.clientPassword,
             }),
