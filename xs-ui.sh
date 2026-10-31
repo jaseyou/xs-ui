@@ -78,11 +78,15 @@ gh_setup_auth() {
         token=$(head -n1 "$GH_TOKEN_FILE" | tr -d '[:space:]')
     fi
     [[ -n "$token" ]] || return 0
+    local umask_bak
+    umask_bak=$(umask)
+    umask 077
     {
         echo "machine github.com login ${token} password x-oauth-basic"
         echo "machine raw.githubusercontent.com login ${token} password x-oauth-basic"
         echo "machine api.github.com login ${token} password x-oauth-basic"
     } > "$GH_NETRC"
+    umask "$umask_bak"
     chmod 600 "$GH_NETRC"
     gh_curl() { curl --netrc-file "$GH_NETRC" "$@"; }
 }
@@ -269,6 +273,12 @@ update_menu() {
 }
 
 legacy_version() {
+    # 校验用户输入的版本号,防止拼接进 URL 的字符串被注入
+    if ! [[ "${1:-}" =~ ^v?[0-9]+(\.[0-9]+)*$ ]]; then
+        LOGE "Invalid version format: ${1:-}. Expected like v3.11.0"
+        before_show_menu
+        return 1
+    fi
     echo -n "Enter the panel version (like 2.4.0):"
     read -r tag_version
 

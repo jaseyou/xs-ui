@@ -229,3 +229,10 @@ body.dark .ant-dropdown-menu-item-divider {
     padding: 8px;
   }
 }
+
+/* PWA 独立全屏时底部避让手势条 */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

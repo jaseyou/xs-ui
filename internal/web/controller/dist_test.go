@@ -66,8 +66,20 @@ func TestPWAHeadInjectionUsesRuntimeBasePath(t *testing.T) {
 	}
 }
 
-func TestPWAHeadInjectionSkipsSubscriptionPage(t *testing.T) {
-	if got := pwaHeadInjection("/panel-secret/", "subpage.html"); got != nil {
-		t.Fatalf("subpage injection = %q, want nil", got)
+// The subscription page also ships PWA head tags: users who add it to their
+// home screen get the brand icon and theme color (it is still noindex).
+func TestPWAHeadInjectionIncludesSubscriptionPage(t *testing.T) {
+	got := string(pwaHeadInjection("/panel-secret/", "subpage.html"))
+	for _, want := range []string{
+		`href="/panel-secret/manifest.webmanifest"`,
+		`href="/panel-secret/icons/brand-192.png"`,
+		`content="#d97757"`,
+	} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("subpage injection missing %q: %s", want, got)
+		}
+	}
+	if !strings.Contains(got, "noindex") {
+		t.Fatalf("subpage injection missing noindex meta: %s", got)
 	}
 }

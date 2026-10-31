@@ -39,6 +39,7 @@ import { useInboundOptions } from '@/api/queries/useInboundOptions';
 import { useAllSettings } from '@/api/queries/useAllSettings';
 import { useTheme } from '@/hooks/useTheme';
 import { PANEL_ROUTES } from '@/routes/panelRoutes';
+import { SIMPLE_MODE_HIDDEN_ROUTES, useSimpleMode } from '@/hooks/useSimpleMode';
 import type { ClientRecord, InboundOption } from '@/schemas/client';
 import { commandPaletteStore, useCommandPalette } from './useCommandPalette';
 import './CommandPalette.css';
@@ -88,6 +89,7 @@ export const PALETTE_KEYWORDS: Record<string, string[]> = {
 };
 
 export default function CommandPalette() {
+  const { simple } = useSimpleMode();
   const { t } = useTranslation();
   const [messageApi, messageContextHolder] = message.useMessage();
   const navigate = useNavigate();
@@ -368,7 +370,9 @@ export default function CommandPalette() {
       });
     });
 
-    const pages = PANEL_ROUTES.map((route) => ({
+    const pages = PANEL_ROUTES.filter(
+      (route) => !simple || !SIMPLE_MODE_HIDDEN_ROUTES.has(route.path),
+    ).map((route) => ({
       path: route.path,
       title: t(route.titleKey),
       keywords: PALETTE_KEYWORDS[route.path] ?? [],
@@ -595,6 +599,7 @@ export default function CommandPalette() {
     allSetting.subURI,
     t,
     close,
+    simple,
     navigate,
     copySubscription,
     restartXray,

@@ -85,12 +85,22 @@ func normalizeWebBasePath(basePath string) string {
 }
 
 func pwaHeadInjection(basePath, pageName string) []byte {
-	if pageName != "index.html" && pageName != "login.html" {
+	if pageName != "index.html" && pageName != "login.html" && pageName != "subpage.html" {
 		return nil
 	}
 
+	// 安装为 App(PWA)所需的头:图标、主题色、manifest。图标与 manifest 由
+	// pwa.go 按随机访问路径提供,这里统一带上 basePath,安卓/iOS 通用。
 	basePath = normalizeWebBasePath(basePath)
-	return []byte(`<link rel="manifest" href="` + htmlpkg.EscapeString(basePath+"manifest.webmanifest") + `"><script data-cfasync="false" defer src="` + htmlpkg.EscapeString(basePath+"pwa-register.js") + `"></script>`)
+	esc := htmlpkg.EscapeString
+	inject := `<link rel="manifest" href="` + esc(basePath+"manifest.webmanifest") + `">` +
+		`<link rel="apple-touch-icon" sizes="192x192" href="` + esc(basePath+"icons/brand-192.png") + `">` +
+		`<meta name="theme-color" content="#d97757">` +
+		`<script data-cfasync="false" defer src="` + esc(basePath+"pwa-register.js") + `"></script>`
+	if pageName == "subpage.html" {
+		inject += `<meta name="robots" content="noindex,nofollow">`
+	}
+	return []byte(inject)
 }
 
 func serveDistPage(c *gin.Context, name string) {
@@ -115,9 +125,10 @@ func serveDistPage(c *gin.Context, name string) {
 		`"`, `\"`,
 		"\n", `\n`,
 		"\r", `\r`,
-		"<", `<`,
-		">", `>`,
-		"&", `&`,
+		// < > & 转成 JS/HTML 安全转义,防止 basePath 等值截断 </script>
+		"<", `\u003c`,
+		">", `\u003e`,
+		"&", `\u0026`,
 	)
 	escapedBase := jsEscape.Replace(basePath)
 	csrfToken, err := session.EnsureCSRFToken(c)

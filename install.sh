@@ -1802,7 +1802,7 @@ install_xs-ui() {
         echo -e "Beginning to install xs-ui ${tag_version}"
         gh_curl -fLR --retry 5 --retry-delay 3 --connect-timeout 15 --speed-limit 1 --speed-time 300 -o ${xui_folder}-linux-$(arch).tar.gz ${url}
         if [[ $? -ne 0 ]]; then
-            echo -e "${red}Download xs-ui ${tag_version} failed, please check if the version exists ${plain}"
+            echo -e "${red}Download xs-ui ${tag_version} failed. Check that the version exists and, for a private repository, that /etc/xs-ui/gh.token contains a valid token ${plain}"
             exit 1
         fi
         if [[ ! -s ${xui_folder}-linux-$(arch).tar.gz ]]; then

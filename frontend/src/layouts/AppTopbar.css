@@ -203,3 +203,10 @@
   border-color: color-mix(in srgb, var(--ant-color-primary) 40%, transparent);
   color: var(--ant-color-primary);
 }
+
+/* 刘海滨Inset:独立全屏(PWA)时顶栏避让刘海 */
+@supports (padding: env(safe-area-inset-top)) {
+  .ant-topbar {
+    padding-top: env(safe-area-inset-top);
+  }
+}

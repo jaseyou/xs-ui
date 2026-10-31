@@ -45,7 +45,8 @@ case $PLATFORM in
         MTG_BIN="mtg-linux-${PLATFORM}"
         ;;
 esac
-MTG_MULTI_VER=$(curl -sfL "https://api.github.com/repos/mhsanaei/mtg-multi/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -n 1)
+# Pinned: floating "latest" downloads are a supply-chain risk (audit #3).
+MTG_MULTI_VER="v1.16.1"
 if [ -z "$MTG_MULTI_VER" ]; then
     echo "DockerInit: could not resolve the latest mtg-multi release tag" >&2
     exit 1
@@ -67,7 +68,8 @@ chmod +x "${MTG_BIN}"
 # sing-box sidecar (anytls / shadowtls / naive templates). Optional dependency:
 # skipped when upstream has no build for this platform; the panel runs without
 # it and only the singbox-hosted templates are unavailable.
-SINGBOX_VER=$(curl -sfL "https://api.github.com/repos/SagerNet/sing-box/releases/latest" | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -n 1)
+# Pinned to the version the panel is tested against (audit #3).
+SINGBOX_VER="v1.14.4"
 if [ -n "$SINGBOX_VER" ]; then
     SINGBOX_PKG="sing-box-${SINGBOX_VER#v}-linux-${PLATFORM}"
     if curl -sfLRO "https://github.com/SagerNet/sing-box/releases/download/${SINGBOX_VER}/${SINGBOX_PKG}.tar.gz"; then

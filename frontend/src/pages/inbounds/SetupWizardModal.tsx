@@ -87,10 +87,15 @@ export default function SetupWizardModal({
   const needsDomain = selectedTemplates.some((tpl) => tpl.needsDomain);
   const needsCert = selectedTemplates.some((tpl) => tpl.needsCert);
 
+  // 向导只在本机面板创建,警告也只匹配本机的同名监听器。
   const overwrites = useMemo(
     () =>
       LISTENER_TEMPLATES.filter(
-        (tpl) => selected.includes(tpl.id) && dbInbounds.some((ib) => ib.tag === `tpl-${tpl.id}`),
+        (tpl) =>
+          selected.includes(tpl.id) &&
+          dbInbounds.some(
+            (ib) => ib.tag === `tpl-${tpl.id}` && (ib.nodeId == null || ib.nodeId === 0),
+          ),
       ),
     [selected, dbInbounds],
   );
@@ -122,7 +127,8 @@ export default function SetupWizardModal({
       });
       await removeOverwrites(creations);
       const { okCount, failed, firstError } = await createListenerInbounds(creations);
-      markWizardDone();
+      // 至少成功一个才算完成向导;全部失败时保留自动弹出,给用户重试机会。
+      if (okCount > 0) markWizardDone();
       if (failed === 0) {
         messageApi.success(t('wizard.done', { count: okCount }));
       } else {

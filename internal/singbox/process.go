@@ -8,6 +8,7 @@ import (
 	"errors"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sync"
 	"syscall"
 	"time"
@@ -92,7 +93,7 @@ func Reconcile(inbounds []*model.Inbound) error {
 		return nil
 	}
 
-	if err := os.WriteFile(GetConfigPath(), jsonBytes, 0o644); err != nil {
+	if err := writeConfigAtomic(jsonBytes); err != nil {
 		return err
 	}
 	stopLocked()
@@ -107,13 +108,44 @@ func IsRunning() bool {
 }
 
 // Stop terminates the sidecar. It is not started again until the next
-// Reconcile with a non-empty configuration.
+// Reconcile with a non-empty configuration. The rendered config file is
+// removed along with the process: it embeds client credentials and REALITY
+// private keys, and Xray writes its own copy on the next start anyway.
 func Stop() {
 	mu.Lock()
 	defer mu.Unlock()
 	intentional = true
 	configHash = ""
 	stopLocked()
+	_ = os.Remove(GetConfigPath())
+}
+
+// writeConfigAtomic writes the rendered config via a temp file + rename, with
+// 0600 permissions: the file carries client passwords and REALITY private keys
+// and must not be world-readable or observed half-written by the sidecar.
+func writeConfigAtomic(jsonBytes []byte) error {
+	tmp, err := os.CreateTemp(filepath.Dir(GetConfigPath()), ".sing-box-*.json")
+	if err != nil {
+		return err
+	}
+	tmpPath := tmp.Name()
+	defer func() {
+		if err != nil {
+			_ = os.Remove(tmpPath)
+		}
+	}()
+	if _, err := tmp.Write(jsonBytes); err != nil {
+		tmp.Close()
+		return err
+	}
+	if err := tmp.Chmod(0o600); err != nil {
+		tmp.Close()
+		return err
+	}
+	if err := tmp.Close(); err != nil {
+		return err
+	}
+	return os.Rename(tmpPath, GetConfigPath())
 }
 
 func startLocked(hash string) error {

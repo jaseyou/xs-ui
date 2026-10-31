@@ -162,7 +162,8 @@ jobs:
           # has 503'd whole release runs while asset downloads kept working.
           case "${{ matrix.platform }}" in
             amd64|arm64|armv7|armv6|386)
-              MTG_MULTI_VER=$(curl -sf $CURL_RETRY -o /dev/null -w '%{redirect_url}' "https://github.com/mhsanaei/mtg-multi/releases/latest" | sed -n 's#.*/releases/tag/##p')
+              # Pinned (audit #3): do not silently drift to a newer sidecar build.
+MTG_MULTI_VER="v1.16.1"
               if [ -z "$MTG_MULTI_VER" ]; then echo "could not resolve the latest mtg-multi release tag"; exit 1; fi
               MTG_PKG="mtg-multi-${MTG_MULTI_VER#v}-linux-${{ matrix.platform }}"
               curl -sfLRO $CURL_RETRY "https://github.com/mhsanaei/mtg-multi/releases/download/${MTG_MULTI_VER}/${MTG_PKG}.tar.gz"
@@ -175,7 +176,8 @@ jobs:
           # templates). Optional dependency: the panel runs fine without it and
           # reports exactly which path it looked at, so platforms without an
           # upstream sing-box build skip gracefully instead of failing the run.
-          SINGBOX_VER=$(curl -sf $CURL_RETRY -o /dev/null -w '%{redirect_url}' "https://github.com/SagerNet/sing-box/releases/latest" | sed -n 's#.*/releases/tag/##p')
+          # Pinned (audit #3): tested against sing-box v1.14.4.
+SINGBOX_VER="v1.14.4"
           if [ -n "$SINGBOX_VER" ]; then
             SINGBOX_ARCH="${{ matrix.platform }}"
             SINGBOX_BIN_ARCH="${SINGBOX_ARCH}"

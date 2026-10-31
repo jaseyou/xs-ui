@@ -1,10 +1,16 @@
 {
-  "name": "MyPanel",
-  "short_name": "MyPanel",
+  "name": "xs-ui",
+  "short_name": "xs-ui",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "lang": "zh-CN",
+  "categories": ["utilities"],
+  "shortcuts": [
+    {"name": "仪表盘", "url": "./panel/"},
+    {"name": "入站管理", "url": "./panel/inbounds"}
+  ],
+  "background_color": "#1f1e1d",
   "theme_color": "#d97757",
   "icons": [
     {

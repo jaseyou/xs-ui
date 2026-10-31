@@ -49,8 +49,10 @@ export async function gatherListenerKeys(selectedIds: string[]): Promise<Generat
     reality: null,
     mldsa65: null,
     vlessEncMlkem: null,
-    clientUuid: crypto.randomUUID(),
-    clientPassword: crypto.randomUUID().replace(/-/g, ''),
+    // RandomUtil has a manual UUIDv4 fallback for plain-HTTP panels, where
+    // crypto.randomUUID (secure-context-only) does not exist.
+    clientUuid: RandomUtil.randomUUID(),
+    clientPassword: RandomUtil.randomUUID().replace(/-/g, ''),
     obfsPassword: generateObfsPassword(),
     ssPassword: generateSs2022Password(),
     shortIds: RandomUtil.randomShortIds()
@@ -154,13 +156,22 @@ export function buildListenerCreations(opts: BuildCreationsOptions): ListenerCre
   });
 }
 
-/** Deletes overwrite targets first (the backend refuses duplicate tags). */
+/**
+ * Deletes overwrite targets first (the backend refuses duplicate tags).
+ * Aborts when any delete fails — continuing would leave the user with a
+ * half-replaced listener instead of their original one.
+ */
 export async function removeOverwrites(creations: ListenerCreation[]): Promise<void> {
   for (const item of creations) {
     if (item.overwrite) {
-      await HttpUtil.post(`/panel/api/inbounds/del/${item.overwrite.id}`, undefined, {
+      const msg = await HttpUtil.post(`/panel/api/inbounds/del/${item.overwrite.id}`, undefined, {
         silent: true,
       });
+      if (!msg?.success) {
+        throw new Error(
+          `${item.overwrite.remark || item.overwrite.tag}: ${msg?.msg || 'delete failed'}`,
+        );
+      }
     }
   }
 }
